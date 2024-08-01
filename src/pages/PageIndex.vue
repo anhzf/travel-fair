@@ -5,7 +5,7 @@ import { toDataURL } from 'qrcode';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AsyncState from '../components/AsyncState.vue';
-import { PARTICIPANTS } from '../contents';
+import { BOOTHS } from '../contents';
 import { getSummary } from '../lib/api';
 
 const router = useRouter();
@@ -65,7 +65,7 @@ const qrString = computed(() => {
       </thead>
 
       <tbody>
-        <tr v-for="el in PARTICIPANTS" :key="el" class="odd:bg-black/1 @dark:odd:bg-white/1">
+        <tr v-for="el in BOOTHS" :key="el" class="odd:bg-black/1 @dark:odd:bg-white/1">
           <td class="py-1 min-w-12ch">
             <RouterLink :to="{ name: 'check-in/stats', params: { name: el } }"
               class="underline decoration-dashed hover:decoration-solid decoration-1.5px">

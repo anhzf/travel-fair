@@ -4,6 +4,7 @@ import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage';
 import * as v from 'valibot';
 import { GuestCreateSchema, GuestPath, GuestSchema } from '../models/guest';
 import { SummaryPath, SummarySchemaMap, VisitsSummarySchema } from '../models/summary';
+import { BOOTHS } from '../contents';
 
 const config = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG);
 
@@ -63,6 +64,10 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
 };
 
 export const checkIn = async (guest: string, name: string) => {
+  if (!BOOTHS.includes(name)) {
+    throw new Error('Booth not found');
+  }
+
   return runTransaction(db, async (t) => {
     const guestRef = doc(db, GuestPath.resolve({ guest }));
     const summaryRef = doc(db, SummaryPath.resolve({ summary: 'visits' }));
