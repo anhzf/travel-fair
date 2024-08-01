@@ -55,12 +55,16 @@ button {
   -webkit-tap-highlight-color: transparent;
   transition: border-color 0.25s;
 
-  &:hover {
+  &:hover:not(:disabled) {
     border-color: #646cff;
   }
   &:focus,
   &:focus-visible {
     outline: 4px auto -webkit-focus-ring-color;
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 

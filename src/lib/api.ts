@@ -1,8 +1,9 @@
 import { initializeApp } from 'firebase/app';
-import { addDoc, doc, getDoc, getFirestore, Timestamp } from 'firebase/firestore/lite';
+import { addDoc, arrayUnion, doc, FieldPath, getDoc, getFirestore, runTransaction, Timestamp } from 'firebase/firestore/lite';
 import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage';
 import * as v from 'valibot';
 import { GuestCreateSchema, GuestPath, GuestSchema } from '../models/guest';
+import { SummaryPath, VisitsSummarySchema } from '../models/summary';
 
 const config = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG);
 
@@ -30,6 +31,7 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
     ...payload
   } = v.parse(GuestCreateSchema, data);
 
+  // Store the files in the storage
   const uploadResults = await Promise.all(
     Object.entries({ proofFollow, proofStory, proofComment })
       .map(async ([key, file]) => {
@@ -51,10 +53,60 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
 
     return result.id;
   } catch (err) {
+    // Clean up the storage if the database operation fails
     uploadResults.forEach(([, upload]) => {
       deleteObject(upload.ref);
     });
 
     throw err;
   }
+};
+
+export const checkIn = async (guest: string, name: string) => {
+  return runTransaction(db, async (t) => {
+    const guestRef = doc(db, GuestPath.resolve({ guest }));
+    const summaryRef = doc(db, SummaryPath.resolve({ summary: 'visits' }));
+
+    const [summarySnap, guestSnap] = await Promise.all([
+      t.get(summaryRef),
+      t.get(guestRef),
+    ]);
+
+    if (!guestSnap.exists()) throw new Error('Unauthorized');
+
+    const guestD = v.parse(GuestSchema, guestSnap.data(), { abortEarly: true });
+
+    t.update(guestRef,
+      'visits.list', arrayUnion(name),
+      new FieldPath('visits', 'details', name, 'count'), (guestD.visits.details[name]?.count ?? 0) + 1,
+      new FieldPath('visits', 'details', name, 'timestamp'), Timestamp.now(),
+      new FieldPath('visits', 'details', name, 'timestamps'), arrayUnion(Timestamp.now()),
+    );
+
+    if (summarySnap.exists()) {
+      const summaryD = v.parse(VisitsSummarySchema, summarySnap.data(), { abortEarly: true });
+
+      t.update(summaryRef,
+        'total', summaryD.total + 1,
+        'unique', summaryD.unique + (guestD.visits.list.includes(name) ? 0 : 1),
+        'timestamp', Timestamp.now(),
+        new FieldPath('details', name, 'count'), (summaryD.details[name]?.count ?? 0) + 1,
+        new FieldPath('details', name, 'timestamp'), Timestamp.now(),
+      );
+    } else {
+      const summaryPlaceholder = v.parse(VisitsSummarySchema, {
+        total: 1,
+        unique: 1,
+        timestamp: Timestamp.now(),
+        details: {
+          [name]: {
+            count: 1,
+            timestamp: Timestamp.now(),
+          },
+        },
+      } satisfies v.InferInput<typeof VisitsSummarySchema>);
+
+      t.set(summaryRef, summaryPlaceholder);
+    }
+  });
 };

@@ -1,4 +1,4 @@
-import { createGlobalState, useAsyncState, useSessionStorage } from '@vueuse/core';
+import { createGlobalState, useAsyncState, useSessionStorage, whenever } from '@vueuse/core';
 import { RESOURCE_PREFIX } from '../constants';
 import { getGuest } from '../lib/api';
 
@@ -11,6 +11,11 @@ export const useGuest = createGlobalState(() => {
     session.value = id;
     await execute();
   };
+
+  whenever(() => state.value === null, () => {
+    console.warn('Guest not found, resetting session');
+    session.value = '';
+  });
 
   return {
     updateSession,

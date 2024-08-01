@@ -1,10 +1,12 @@
 <script lang="ts" setup>
-import { flatten, isValiError, ValiError } from 'valibot';
+import { isValiError } from 'valibot';
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useGuest } from '../composables/use-guest';
+import { useLoading } from '../composables/use-loading';
 import { createGuest } from '../lib/api';
 import { GuestCreateSchema } from '../models/guest';
+import { getValiErrorMessages } from '../utils/error';
 
 const INTEREST_OPTIONS = [
   'Harga',
@@ -21,18 +23,10 @@ const AGE_OPTIONS = [
   '50+',
 ];
 
-const getValiErrorMessages = <T extends ValiError<any>>(err: T) => {
-  const { root = [], nested = {} } = flatten(err.issues);
-  return [
-    err.message,
-    ...root,
-    ...Object.entries(nested).map(([key, value]) => `[${key}] ${value}`),
-  ];
-};
-
 const route = useRoute();
 const router = useRouter();
 
+const [isLoading, loading] = useLoading();
 const { updateSession } = useGuest();
 
 const errors = ref<string[]>([]);
@@ -118,7 +112,7 @@ const onSubmit = async (ev: Event) => {
         </ul>
       </div>
 
-      <button type="submit">
+      <button type="submit" :disabled="isLoading">
         Simpan
       </button>
     </form>
