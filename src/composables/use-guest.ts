@@ -1,0 +1,22 @@
+import { createGlobalState, useAsyncState, useSessionStorage } from '@vueuse/core';
+import { RESOURCE_PREFIX } from '../constants';
+import { getGuest } from '../lib/api';
+
+const GUEST_KEY = `${RESOURCE_PREFIX}guest`;
+
+export const useGuest = createGlobalState(() => {
+  const session = useSessionStorage(GUEST_KEY, '');
+  const { state, isLoading, execute, error } = useAsyncState(() => getGuest(session.value), null);
+  const updateSession = async (id: string) => {
+    session.value = id;
+    await execute();
+  };
+
+  return {
+    updateSession,
+    data: state,
+    isLoading,
+    refresh: execute,
+    error,
+  };
+});

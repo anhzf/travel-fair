@@ -1,4 +1,11 @@
 <script lang="ts" setup>
+import { flatten, isValiError, ValiError } from 'valibot';
+import { ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useGuest } from '../composables/use-guest';
+import { createGuest } from '../lib/api';
+import { GuestCreateSchema } from '../models/guest';
+
 const INTEREST_OPTIONS = [
   'Harga',
   'Fasilitas yang lebih baik',
@@ -14,16 +21,42 @@ const AGE_OPTIONS = [
   '50+',
 ];
 
-const onSubmit = (ev: Event) => {
-  const target = ev.target as HTMLFormElement;
-  const fd = new FormData(target);
+const getValiErrorMessages = <T extends ValiError<any>>(err: T) => {
+  const { root = [], nested = {} } = flatten(err.issues);
+  return [
+    err.message,
+    ...root,
+    ...Object.entries(nested).map(([key, value]) => `[${key}] ${value}`),
+  ];
+};
 
-  console.log(Object.fromEntries(fd));
+const route = useRoute();
+const router = useRouter();
+
+const { updateSession } = useGuest();
+
+const errors = ref<string[]>([]);
+
+const onSubmit = async (ev: Event) => {
+  try {
+    const target = ev.target as HTMLFormElement;
+    const fd = new FormData(target);
+
+    const id = await createGuest(Object.fromEntries(fd) as any);
+
+    await updateSession(id);
+
+    router.push(route.redirectedFrom ?? { name: 'welcome/thank-you' });
+  } catch (err) {
+    errors.value = isValiError(err)
+      ? getValiErrorMessages(err)
+      : [String(err)];
+  }
 }
 </script>
 
 <template>
-  <main class="container flex flex-col items-center gap-6">
+  <main class="container m-auto flex flex-col items-center gap-6">
     <h1 class="text-4xl">
       Selamat Datang!
     </h1>
@@ -61,18 +94,29 @@ const onSubmit = (ev: Event) => {
 
       <fieldset class="grid border-none">
         <label for="welcome/proofFollow">Bukti Follow</label>
-        <input type="file" name="proofFollow" id="welcome/proofFollow" accept="image/*" required class="px-3 py-2">
+        <input type="file" name="proofFollow" id="welcome/proofFollow"
+          :accept="GuestCreateSchema.entries.proofFollow.pipe[1].requirement.join(',')" required class="px-3 py-2">
       </fieldset>
 
       <fieldset class="grid border-none">
         <label for="welcome/proofStory">Bukti Share Story</label>
-        <input type="file" name="proofStory" id="welcome/proofStory" accept="image/*" required class="px-3 py-2">
+        <input type="file" name="proofStory" id="welcome/proofStory"
+          :accept="GuestCreateSchema.entries.proofStory.pipe[1].requirement.join(',')" required class="px-3 py-2">
       </fieldset>
 
       <fieldset class="grid border-none">
         <label for="welcome/proofComment">Bukti Komen</label>
-        <input type="file" name="proofComment" id="welcome/proofComment" accept="image/*" required class="px-3 py-2">
+        <input type="file" name="proofComment" id="welcome/proofComment"
+          :accept="GuestCreateSchema.entries.proofComment.pipe[1].requirement.join(',')" required class="px-3 py-2">
       </fieldset>
+
+      <div v-if="errors.length">
+        <ul class="text-red-500">
+          <li v-for="err in errors" :key="err">
+            {{ err }}
+          </li>
+        </ul>
+      </div>
 
       <button type="submit">
         Simpan

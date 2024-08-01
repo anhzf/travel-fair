@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { Dialog, DialogPanel, DialogTitle, DialogDescription } from '@headlessui/vue';
-import { PARTICIPANTS } from '../contents';
+import { Dialog, DialogDescription, DialogPanel, DialogTitle } from '@headlessui/vue';
 import { toDataURL } from 'qrcode';
-import AsyncState from '../components/AsyncState.vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { sleep } from '../utils/promise';
+import AsyncState from '../components/AsyncState.vue';
+import { PARTICIPANTS } from '../contents';
 
 const router = useRouter();
 

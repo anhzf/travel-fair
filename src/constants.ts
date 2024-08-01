@@ -1,1 +1,1 @@
-export const RESOURCE_PREFIX = 'guest-book/DEV/';
+export const RESOURCE_PREFIX = `guest-book/${import.meta.env.PROD ? 'PROD' : 'DEV'}/` as const;

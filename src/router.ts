@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
+import { useGuest } from './composables/use-guest';
+import { until } from '@vueuse/core';
 
 export const routes: RouteRecordRaw[] = [
   {
@@ -6,13 +8,24 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('./pages/PageIndex.vue'),
   },
   {
-    name: 'welcome',
     path: '/welcome',
-    component: () => import('./pages/PageWelcome.vue'),
+    children: [
+      {
+        name: 'welcome',
+        path: '',
+        component: () => import('./pages/PageWelcome.vue'),
+        meta: { guest: false },
+      },
+      {
+        name: 'welcome/thank-you',
+        path: 'thank-you',
+        component: () => import('./pages/PageThankYou.vue'),
+      },
+    ],
   },
   {
     name: 'guest',
-    path: '/guest/:guest',
+    path: '/guest/:guest?',
     component: () => import('./pages/PageGuest.vue'),
   },
   {
@@ -22,6 +35,7 @@ export const routes: RouteRecordRaw[] = [
         name: 'check-in',
         path: '',
         component: () => import('./pages/PageCheckIn.vue'),
+        meta: { guest: true },
       },
       {
         name: 'check-in/stats',
@@ -35,4 +49,19 @@ export const routes: RouteRecordRaw[] = [
 export const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach(async (to, _, next) => {
+  const { data: guest, isLoading } = useGuest();
+  await until(isLoading).toBe(false);
+
+  if (to.meta.guest === true) {
+    if (guest.value) return next();
+    else return next({ name: 'welcome' });
+  } else if (to.meta.guest === false) {
+    if (guest.value) return next({ name: 'guest' });
+    else return next();
+  }
+
+  return next();
 });
