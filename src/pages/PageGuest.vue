@@ -19,6 +19,7 @@ const { data } = useGuest();
       </a>
     </div>
 
-    <pre>{{ data?.questions }}</pre>
+    <pre class="container">{{ data?.questions }}</pre>
+    <pre class="container">{{ data?.visits }}</pre>
   </main>
 </template>

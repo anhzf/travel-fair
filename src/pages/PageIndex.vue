@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { Dialog, DialogDescription, DialogPanel, DialogTitle } from '@headlessui/vue';
+import { useAsyncState } from '@vueuse/core';
 import { toDataURL } from 'qrcode';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import AsyncState from '../components/AsyncState.vue';
 import { PARTICIPANTS } from '../contents';
+import { getSummary } from '../lib/api';
 
 const router = useRouter();
+
+const { state, isLoading, execute: refresh, error } = useAsyncState(() => getSummary('visits'), null);
 
 const qr = ref<{
   title: string;
@@ -22,7 +26,29 @@ const qrString = computed(() => {
 </script>
 
 <template>
-  <main class="container mx-auto flex flex-col items-center">
+  <main class="container mx-auto flex flex-col items-center gap-6">
+    <div v-if="error" class="text-red-500 w-full">{{ error }}</div>
+
+    <div class="w-full flex justify-between items-start gap-4">
+      <div>
+        <h1 class="text-xl m-0">
+          Ringkasan Kunjungan
+        </h1>
+
+        <div>
+          <b class="font-medium">Total: </b> {{ isLoading ? 'Loading...' : state?.total || '-' }}
+        </div>
+        <div>
+          <b class="font-medium">Total unik: </b> {{ isLoading ? 'Loading...' : state?.unique || '-' }}
+        </div>
+      </div>
+
+      <button type="button" :disabled="isLoading" @click="refresh()">
+        ↻ Refresh
+      </button>
+    </div>
+
+
     <table class="w-full border-collapse">
       <thead>
         <tr class="border-b border-b-solid border-white/25">
@@ -47,7 +73,7 @@ const qrString = computed(() => {
             </RouterLink>
           </td>
           <td class="py-1 w-20ch text-center">
-            {{ NaN }}
+            {{ isLoading ? 'Loading...' : state?.details[el]?.count || '-' }}
           </td>
           <td class="py-1 w-20ch text-center">
             <button type="button" @click="qr = { title: el }">

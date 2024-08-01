@@ -3,7 +3,7 @@ import { addDoc, arrayUnion, doc, FieldPath, getDoc, getFirestore, runTransactio
 import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage';
 import * as v from 'valibot';
 import { GuestCreateSchema, GuestPath, GuestSchema } from '../models/guest';
-import { SummaryPath, VisitsSummarySchema } from '../models/summary';
+import { SummaryPath, SummarySchemaMap, VisitsSummarySchema } from '../models/summary';
 
 const config = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG);
 
@@ -110,3 +110,14 @@ export const checkIn = async (guest: string, name: string) => {
     }
   });
 };
+
+export const getSummary = async <K extends keyof typeof SummarySchemaMap>(key: K) => {
+  const docRef = doc(db, SummaryPath.resolve({ summary: key }));
+  const snapshot = await getDoc(docRef);
+
+  if (!snapshot.exists()) return null;
+
+  const data = snapshot.data();
+
+  return v.parse(SummarySchemaMap[key], data);
+} 
