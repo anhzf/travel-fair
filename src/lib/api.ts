@@ -120,4 +120,4 @@ export const getSummary = async <K extends keyof typeof SummarySchemaMap>(key: K
   const data = snapshot.data();
 
   return v.parse(SummarySchemaMap[key], data);
-} 
+};
