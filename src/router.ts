@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
-import { useGuest } from './composables/use-guest';
+import { useSession } from './composables/use-session';
 import { until } from '@vueuse/core';
 
 export const routes: RouteRecordRaw[] = [
@@ -52,7 +52,7 @@ export const router = createRouter({
 });
 
 router.beforeEach(async (to, _, next) => {
-  const { data: guest, isLoading } = useGuest();
+  const { data: guest, isLoading } = useSession();
   await until(isLoading).toBe(false);
 
   if (to.meta.guest === true) {

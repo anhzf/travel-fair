@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useGuest } from '../composables/use-guest';
+import { useSession } from '../composables/use-session';
 
-const { data } = useGuest();
+const { data } = useSession();
 </script>
 
 <template>

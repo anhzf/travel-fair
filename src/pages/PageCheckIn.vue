@@ -2,7 +2,7 @@
 import { isValiError } from 'valibot';
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { useGuest } from '../composables/use-guest';
+import { useSession } from '../composables/use-session';
 import { useLoading } from '../composables/use-loading';
 import { checkIn } from '../lib/api';
 import { getValiErrorMessages } from '../utils/error';
@@ -12,7 +12,7 @@ const route = useRoute();
 const [isLoading, loading] = useLoading();
 const errors = ref<string[]>([]);
 
-const { data: guest } = useGuest();
+const { data: guest } = useSession();
 
 const isCheckedIn = ref(false);
 

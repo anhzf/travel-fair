@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
-import { useGuest } from './composables/use-guest';
+import { useSession } from './composables/use-session';
 
-const { isLoading } = useGuest();
+const { isLoading } = useSession();
 </script>
 
 <template>

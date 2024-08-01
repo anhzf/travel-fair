@@ -2,7 +2,7 @@
 import { isValiError } from 'valibot';
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useGuest } from '../composables/use-guest';
+import { useSession } from '../composables/use-session';
 import { useLoading } from '../composables/use-loading';
 import { createGuest } from '../lib/api';
 import { GuestCreateSchema } from '../models/guest';
@@ -27,7 +27,7 @@ const route = useRoute();
 const router = useRouter();
 
 const [isLoading, loading] = useLoading();
-const { updateSession } = useGuest();
+const { update: updateSession } = useSession();
 
 const errors = ref<string[]>([]);
 

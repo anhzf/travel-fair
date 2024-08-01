@@ -1,25 +1,37 @@
 <script lang="ts" setup>
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import { useGuest } from '../composables/use-guest';
+import { useSession } from '../composables/use-session';
 
-const { data } = useGuest();
+const route = useRoute();
+
+const id = computed(() => route.params.guest as string);
+
+const { data: profile } = useGuest(id);
+const { data: session } = useSession();
+
+const data = computed(() => profile.value ?? session.value);
 </script>
 
 <template>
   <main class="container mx-auto flex flex-col items-center gap-6">
     <code class="bg-white/5 px-1 rounded text-center">
-      {{ data?.id }}
+      {{ id ?? data?.id }}
     </code>
 
-    <div class="text-center">
-      <h1 class="mb-2">
-        {{ data?.name }}
-      </h1>
-      <a :href="`tel:${data?.phone}`" target="_blank">
-        +{{ data?.phone }}
-      </a>
-    </div>
+    <template v-if="data">
+      <div class="text-center">
+        <h1 class="mb-2">
+          {{ data?.name }}
+        </h1>
+        <a :href="`tel:${data?.phone}`" target="_blank">
+          +{{ data?.phone }}
+        </a>
+      </div>
 
-    <pre class="container">{{ data?.questions }}</pre>
-    <pre class="container">{{ data?.visits }}</pre>
+      <pre class="container">{{ data?.questions }}</pre>
+      <pre class="container">{{ data?.visits }}</pre>
+    </template>
   </main>
 </template>
