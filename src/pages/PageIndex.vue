@@ -1,11 +1,25 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Dialog, DialogPanel, DialogTitle, DialogDescription } from '@headlessui/vue';
 import { PARTICIPANTS } from '../contents';
+import { toDataURL } from 'qrcode';
+import AsyncState from '../components/AsyncState.vue';
+import { useRouter } from 'vue-router';
+import { sleep } from '../utils/promise';
+
+const router = useRouter();
 
 const qr = ref<{
   title: string;
 }>();
+
+const qrString = computed(() => {
+  if (!qr.value) return '';
+  const { fullPath } = router.resolve({ name: 'check-in', params: { name: qr.value?.title } });
+  const url = new URL(location.origin);
+  url.pathname = fullPath;
+  return url.toString();
+});
 </script>
 
 <template>
@@ -20,14 +34,14 @@ const qr = ref<{
             Jumlah Kunjungan
           </th>
           <th class="px-1 py-2.5">
-            QR
+            ...
           </th>
         </tr>
       </thead>
 
       <tbody>
         <tr v-for="el in PARTICIPANTS" :key="el" class="odd:bg-black/1 @dark:odd:bg-white/1">
-          <td class="py-1 ">
+          <td class="py-1 min-w-12ch">
             <RouterLink :to="{ name: 'check-in/stats', params: { name: el } }"
               class="underline decoration-dashed hover:decoration-solid decoration-1.5px">
               {{ el }}
@@ -38,7 +52,7 @@ const qr = ref<{
           </td>
           <td class="py-1 w-20ch text-center">
             <button type="button" @click="qr = { title: el }">
-              Lihat
+              Lihat QR
             </button>
           </td>
         </tr>
@@ -47,11 +61,10 @@ const qr = ref<{
   </main>
 
   <Dialog :open="!!qr" class="relative z-100 flex flex-col justify-center items-center">
-    <div class="fixed inset-0 bg-gray-700/50" aria-hidden="true" />
+    <div class="fixed inset-0 bg-gray-700/50" aria-hidden="true" @click="qr = undefined" />
 
-    <div class="fixed inset-0 p-8 flex flex-col justify-center items-center">
-      <DialogPanel
-        class="grow w-full max-w-prose h-full max-h-full bg-$background rounded flex flex-col overflow-hidden">
+    <div class="fixed inset-0 p-4 lg:p-8 flex flex-col justify-center items-center" @click.self="qr = undefined">
+      <DialogPanel class="w-full max-w-prose max-h-full bg-$background rounded flex flex-col overflow-hidden">
         <DialogTitle class="text-center mb-0">
           Lihat QR
         </DialogTitle>
@@ -60,7 +73,10 @@ const qr = ref<{
         </DialogDescription>
 
         <div class="flex flex-col py-2 overflow-y-auto">
-          <img src="https://placehold.co/500" width="500" height="500" :alt="`QR ${qr!.title}`" class="size-full">
+          <AsyncState :value="toDataURL(qrString, { width: 500 })" #="{ state: src }">
+            <img :src width="500" height="500" :alt="`QR ${qr!.title}`"
+              class="size-full object-contain relative before:content-[''] before:absolute before:inset-0 before:bg-gray before:animate-pulse">
+          </AsyncState>
         </div>
 
         <div class="flex flex-col items-stretch p-3">

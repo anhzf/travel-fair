@@ -30,7 +30,7 @@ body {
 }
 
 #app {
-  --at-apply: p-8 mx-auto;
+  --at-apply: p-4 lg:p-8 mx-auto;
 }
 
 h1 {
@@ -47,6 +47,7 @@ button {
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
   transition: border-color 0.25s;
 
   &:hover {
