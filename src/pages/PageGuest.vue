@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useGuest } from '../composables/use-guest';
 import { useSession } from '../composables/use-session';
 
 const route = useRoute();
+const router = useRouter();
 
 const id = computed(() => route.params.guest as string);
 
@@ -12,6 +13,8 @@ const { data: profile } = useGuest(id);
 const { data: session } = useSession();
 
 const data = computed(() => profile.value ?? session.value);
+
+if (!data.value) router.push({ name: 'welcome' });
 </script>
 
 <template>
