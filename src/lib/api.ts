@@ -1,10 +1,10 @@
 import { initializeApp } from 'firebase/app';
-import { addDoc, arrayUnion, doc, FieldPath, getDoc, getFirestore, runTransaction, Timestamp } from 'firebase/firestore/lite';
+import { addDoc, arrayUnion, doc, FieldPath, getDoc, getDocs, getFirestore, runTransaction, Timestamp } from 'firebase/firestore/lite';
 import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage';
 import * as v from 'valibot';
+import { BOOTHS } from '../contents';
 import { GuestCreateSchema, GuestPath, GuestSchema } from '../models/guest';
 import { SummaryPath, SummarySchemaMap, VisitsSummarySchema } from '../models/summary';
-import { BOOTHS } from '../contents';
 
 const config = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG);
 
@@ -22,6 +22,16 @@ export const getGuest = async (id: string) => {
 
   return Object.assign(v.parse(GuestSchema, data), { id });
 };
+
+export const getGuests = async () => {
+  const collRef = doc(db, GuestPath.path).parent;
+  const result = await getDocs(collRef);
+
+  return result.docs.map((doc) => Object.assign(
+    v.parse(GuestSchema, doc.data()),
+    { id: doc.id },
+  ));
+}
 
 export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) => {
   const coll = doc(db, GuestPath.path).parent;

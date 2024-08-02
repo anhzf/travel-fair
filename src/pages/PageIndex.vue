@@ -3,7 +3,7 @@ import { Dialog, DialogDescription, DialogPanel, DialogTitle } from '@headlessui
 import { useAsyncState } from '@vueuse/core';
 import { toDataURL } from 'qrcode';
 import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 import AsyncState from '../components/AsyncState.vue';
 import { BOOTHS } from '../contents';
 import { getSummary } from '../lib/api';
@@ -43,9 +43,14 @@ const qrString = computed(() => {
         </div>
       </div>
 
-      <button type="button" :disabled="isLoading" @click="refresh()">
-        ↻ Refresh
-      </button>
+      <div class="flex flex-col lg:flex-row gap-2 items-end lg:items-center">
+        <RouterLink :to="{ name: 'visitors' }" class="px-1 py-2">
+          Semua pengunjung
+        </RouterLink>
+        <button type="button" :disabled="isLoading" @click="refresh()">
+          ↻ Refresh
+        </button>
+      </div>
     </div>
 
 
@@ -67,8 +72,7 @@ const qrString = computed(() => {
       <tbody>
         <tr v-for="el in BOOTHS" :key="el" class="odd:bg-black/1 @dark:odd:bg-white/1">
           <td class="py-1 min-w-12ch">
-            <RouterLink :to="{ name: 'check-in/stats', params: { name: el } }"
-              class="underline decoration-dashed hover:decoration-solid decoration-1.5px">
+            <RouterLink :to="{ name: 'check-in/stats', params: { name: el } }">
               {{ el }}
             </RouterLink>
           </td>

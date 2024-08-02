@@ -4,8 +4,14 @@ import { until } from '@vueuse/core';
 
 export const routes: RouteRecordRaw[] = [
   {
+    name: 'index',
     path: '/',
     component: () => import('./pages/PageIndex.vue'),
+  },
+  {
+    name: 'visitors',
+    path: '/visitors',
+    component: () => import('./pages/PageVisitors.vue'),
   },
   {
     path: '/welcome',
