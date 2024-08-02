@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { addDoc, arrayUnion, doc, FieldPath, getDoc, getDocs, getFirestore, runTransaction, Timestamp } from 'firebase/firestore/lite';
+import { addDoc, arrayUnion, count, doc, FieldPath, getAggregate, getDoc, getDocs, getFirestore, query, runTransaction, sum, Timestamp, where } from 'firebase/firestore/lite';
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import * as v from 'valibot';
 import { BOOTHS } from '../contents';
@@ -151,4 +151,15 @@ export const getAttachment = async (gsUrl: string) => {
     url,
     name: objRef.name,
   };
+};
+
+export const getGuestsByBooth = async (name: string) => {
+  const guestColl = doc(db, GuestPath.path).parent;
+  const q = query(guestColl, where('visits.list', 'array-contains', name));
+  const snapshot = await getDocs(q);
+
+  return snapshot.docs.map((doc) => Object.assign(
+    v.parse(GuestSchema, doc.data()),
+    { id: doc.id },
+  ));
 };
