@@ -26,6 +26,7 @@ export const GuestSchema = v.object({
 
 export const GuestCreateSchema = v.object({
   ...v.pick(GuestSchema, ['name', 'phone']).entries,
+  age: v.string(),
   proofFollow: v.pipe(
     v.file(),
     v.mimeType(['image/png', 'image/jpeg']),

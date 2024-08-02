@@ -15,9 +15,12 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    border-style: solid;
   }
 
   * {
+    border: 0;
     box-sizing: border-box;
   }
 

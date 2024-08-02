@@ -1,20 +1,29 @@
 <script lang="ts" setup>
+import { until } from '@vueuse/core';
 import { computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import AsyncState from '../components/AsyncState.vue';
 import { useGuest } from '../composables/use-guest';
 import { useSession } from '../composables/use-session';
+import { getAttachment } from '../lib/api';
 
 const route = useRoute();
 const router = useRouter();
 
 const id = computed(() => route.params.guest as string);
 
-const { data: profile } = useGuest(id);
-const { data: session } = useSession();
+const { data: profile, isLoading: isProfileLoading } = useGuest(id);
+const { data: session, isLoading: isSessionLoading } = useSession();
 
 const data = computed(() => profile.value ?? session.value);
 
-if (!data.value) router.push({ name: 'welcome' });
+Promise.all([
+  until(isProfileLoading).toBe(false),
+  until(isSessionLoading).toBe(false),
+])
+  .then(() => {
+    if (!data.value) router.push({ name: 'welcome' });
+  });
 </script>
 
 <template>
@@ -26,15 +35,58 @@ if (!data.value) router.push({ name: 'welcome' });
     <template v-if="data">
       <div class="text-center">
         <h1 class="mb-2">
-          {{ data?.name }}
+          {{ data.name }}
         </h1>
-        <a :href="`tel:${data?.phone}`" target="_blank">
-          +{{ data?.phone }}
+
+        <a :href="`tel:${data.phone}`" target="_blank">
+          +{{ data.phone }}
         </a>
       </div>
 
-      <pre class="container">{{ data?.questions }}</pre>
-      <pre class="container">{{ data?.visits }}</pre>
+      <ol class="w-full max-w-prose">
+        <li v-for="(answer, question) in data.questions" :key="question">
+          <div class="font-semibold">{{ question }}</div>
+
+          <AsyncState v-if="(typeof answer === 'string' && answer.startsWith('gs://'))" :value="getAttachment(answer)"
+            #="{ state, isLoading, error }">
+            <div v-if="state">
+              <a :href="state.url" target="_blank" rel="noopener noreferrer">
+                {{ state.name }}
+              </a>
+            </div>
+            <div v-else-if="isLoading">
+              Loading...
+            </div>
+            <div v-else-if="error" class="text-red-500">
+              {{ error }}
+            </div>
+            <div v-else>
+              {{ answer }}
+            </div>
+          </AsyncState>
+
+          <div v-else>
+            {{ answer }}
+          </div>
+        </li>
+      </ol>
+
+      <div class="w-full flex flex-col">
+        <h2>Daftar Kunjungan</h2>
+
+        <ol class="w-full max-w-prose">
+          <li v-for="(detail, visit) in data.visits.details" :key="visit">
+            <span class="font-semibold">
+              {{ visit }}
+            </span>
+            <span class="text-gray-400"> x{{ detail.count }}</span>
+          </li>
+        </ol>
+      </div>
     </template>
+
+    <div v-else-if="isProfileLoading || isSessionLoading">
+      Loading...
+    </div>
   </main>
 </template>

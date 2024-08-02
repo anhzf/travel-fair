@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { addDoc, arrayUnion, doc, FieldPath, getDoc, getDocs, getFirestore, runTransaction, Timestamp } from 'firebase/firestore/lite';
-import { deleteObject, getStorage, ref, uploadBytes } from 'firebase/storage';
+import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import * as v from 'valibot';
 import { BOOTHS } from '../contents';
 import { GuestCreateSchema, GuestPath, GuestSchema } from '../models/guest';
@@ -55,7 +55,9 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
 
   const parsed = v.parse(GuestSchema, {
     ...payload,
-    questions: Object.fromEntries(uploadResults.map(([key, upload]) => [key, upload.ref.toString()])),
+    questions: Object.assign(Object.fromEntries(uploadResults.map(([key, upload]) => [key, upload.ref.toString()])), {
+      age: payload.age,
+    }),
     createdAt: Timestamp.now(),
   });
 
@@ -139,4 +141,14 @@ export const getSummary = async <K extends keyof typeof SummarySchemaMap>(key: K
   const data = snapshot.data();
 
   return v.parse(SummarySchemaMap[key], data);
+};
+
+export const getAttachment = async (gsUrl: string) => {
+  const objRef = ref(storage, gsUrl);
+  const url = await getDownloadURL(objRef);
+
+  return {
+    url,
+    name: objRef.name,
+  };
 };
