@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { addDoc, arrayUnion, count, doc, FieldPath, getAggregate, getDoc, getDocs, getFirestore, query, runTransaction, sum, Timestamp, where } from 'firebase/firestore/lite';
+import { addDoc, arrayUnion, doc, FieldPath, getDoc, getDocs, getFirestore, query, runTransaction, Timestamp, where } from 'firebase/firestore/lite';
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import * as v from 'valibot';
 import { BOOTHS } from '../contents';
