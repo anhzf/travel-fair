@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { isValiError } from 'valibot';
 import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { RouterLink, useRoute } from 'vue-router';
 import { useLoading } from '../composables/use-loading';
 import { useSession } from '../composables/use-session';
 import { BOOTHS } from '../contents';
@@ -54,10 +54,16 @@ const onSubmit = async () => {
           Sebagai <strong>{{ guest?.name }}</strong>
         </div>
 
-        <div v-if="isCheckedIn"
-          class="w-full text-xl px-2 py-3 bg-green-900/50 text-green-100 text-center rounded border border-solid border-green-400">
-          Anda telah check-in ✓
-        </div>
+        <template v-if="isCheckedIn">
+          <div
+            class="w-full text-xl px-2 py-3 bg-green-900/50 text-green-100 text-center rounded border border-solid border-green-400">
+            Anda telah check-in ✓
+          </div>
+
+          <RouterLink :to="{ name: 'guest' }" class="flex justify-center text-center px-2 py-3">
+            Lihat riwayat kunjungan
+          </RouterLink>
+        </template>
 
         <button v-else :disabled="isLoading"
           :class="['w-full text-xl py-3 @dark:shadow-white/10', isLoading ? 'shadow-none' : 'shadow-xl']">

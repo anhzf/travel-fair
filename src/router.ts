@@ -26,6 +26,7 @@ export const routes: RouteRecordRaw[] = [
         name: 'welcome/thank-you',
         path: 'thank-you',
         component: () => import('./pages/PageThankYou.vue'),
+        meta: { guest: true },
       },
     ],
   },

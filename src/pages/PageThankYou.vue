@@ -9,7 +9,7 @@ const { data } = useSession();
     <div class="text-center">
       <h1>🥳 Terima Kasih!</h1>
       <p>
-        Selamat menikmati acara ini, {{ data?.name }}!
+        Selamat menikmati acara ini, <span class="font-semibold">{{ data?.name }}</span>!
       </p>
     </div>
   </main>
