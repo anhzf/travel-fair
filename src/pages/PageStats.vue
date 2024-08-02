@@ -24,6 +24,9 @@ const data = [
       <div>
         Total Kunjungan: {{ isLoading ? 'Loading...' : general?.details[name]?.count ?? '-' }}
       </div>
+      <div>
+        Kunjungan Unik: {{ isLoading ? 'Loading...' : general?.details[name]?.unique ?? '-' }}
+      </div>
     </div>
 
     <div v-if="error" class="text-red-500">{{ error }}</div>

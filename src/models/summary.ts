@@ -10,6 +10,7 @@ export const VisitsSummarySchema = v.object({
   timestamp: v.instance(Timestamp),
   details: v.record(v.string(), v.object({
     count: v.number(),
+    unique: v.number(),
     timestamp: v.instance(Timestamp),
   })),
 });

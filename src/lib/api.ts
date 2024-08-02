@@ -91,11 +91,14 @@ export const checkIn = async (guest: string, name: string) => {
     if (summarySnap.exists()) {
       const summaryD = v.parse(VisitsSummarySchema, summarySnap.data(), { abortEarly: true });
 
+      const isAlreadyVisit = guestD.visits.list.includes(name);
+
       t.update(summaryRef,
         'total', summaryD.total + 1,
-        'unique', summaryD.unique + (guestD.visits.list.includes(name) ? 0 : 1),
+        'unique', summaryD.unique + (isAlreadyVisit ? 0 : 1),
         'timestamp', Timestamp.now(),
         new FieldPath('details', name, 'count'), (summaryD.details[name]?.count ?? 0) + 1,
+        new FieldPath('details', name, 'unique'), (summaryD.details[name]?.count ?? 0) + (isAlreadyVisit ? 0 : 1),
         new FieldPath('details', name, 'timestamp'), Timestamp.now(),
       );
     } else {
@@ -106,6 +109,7 @@ export const checkIn = async (guest: string, name: string) => {
         details: {
           [name]: {
             count: 1,
+            unique: 1,
             timestamp: Timestamp.now(),
           },
         },
