@@ -4,11 +4,9 @@ export default defineConfig({
   presets: [
     presetUno(),
     presetWebFonts({
-      timeouts: {
-        failure: undefined,
-      },
+      timeouts: false,
       fonts: {
-        Inter: ['400', '500', '600', '700'],
+        sans: 'Inter Tight:400,500,600,700,800,900',
       },
     }),
   ],

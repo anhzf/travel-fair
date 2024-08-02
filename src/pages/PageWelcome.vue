@@ -26,7 +26,7 @@ const AGE_OPTIONS = [
 const route = useRoute();
 const router = useRouter();
 
-const [isLoading, loading] = useLoading();
+const [isLoading] = useLoading();
 const { update: updateSession } = useSession();
 
 const errors = ref<string[]>([]);
