@@ -1,20 +1,41 @@
 <script lang="ts" setup>
 import { useAsyncState } from '@vueuse/core';
-import { getGuests } from '../lib/api';
+import { useLoading } from '../composables/use-loading';
+import { exportGuestsAsCsv, getGuests } from '../lib/api';
 import { omit } from '../utils/object';
+import { download } from '../utils/ui';
 
-const { state: data, isLoading, error } = useAsyncState(() => getGuests(), []);
+const [isOverlayLoading, loading] = useLoading();
+const { state: data, isLoading, error, execute: refresh } = useAsyncState(() => getGuests(), []);
+
+const onExportClick = async () => {
+  if (!window.confirm('Apakah Anda yakin ingin mengekspor data pengunjung?')) return;
+
+  const blob = await loading(exportGuestsAsCsv(data.value));
+
+  download('pengunjung.csv', blob);
+};
 </script>
 
 <template>
   <main class="container mx-auto flex flex-col items-center gap-6">
-    <h1>Daftar Pengunjung</h1>
+    <div class="flex flex-col">
+      <h1 class="mb-0.3em">Daftar Pengunjung</h1>
+      <div class="flex justify-center gap-2">
+        <button type="button" :disabled="isLoading" @click="refresh()">
+          ↻ Refresh
+        </button>
+        <button type="button" :disabled="isLoading" @click="onExportClick()">
+          Export CSV
+        </button>
+      </div>
+    </div>
 
     <div v-if="isLoading">
       Loading...
     </div>
 
-    <table v-if="data.length" class="w-full max-w-screen-lg border-collapse">
+    <table v-else-if="data.length" class="w-full max-w-screen-lg border-collapse">
       <thead>
         <tr>
           <th class="text-white/50 border-b border-solid border-white/50 px-2 py-2.5">
@@ -89,6 +110,10 @@ const { state: data, isLoading, error } = useAsyncState(() => getGuests(), []);
 
     <div v-else>
       No data
+    </div>
+
+    <div v-if="isOverlayLoading" class="fixed inset-0 bg-gray-700/50 flex flex-col justify-center items-center">
+      Loading...
     </div>
   </main>
 </template>

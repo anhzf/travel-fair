@@ -5,6 +5,7 @@ import * as v from 'valibot';
 import { BOOTHS } from '../contents';
 import { GuestCreateSchema, GuestPath, GuestSchema } from '../models/guest';
 import { SummaryPath, SummarySchemaMap, VisitsSummarySchema } from '../models/summary';
+import { stringify } from 'csv-stringify/browser/esm/sync';
 
 const config = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG);
 
@@ -168,4 +169,36 @@ export const getGuestsByBooth = async (name: string) => {
     v.parse(GuestSchema, doc.data()),
     { id: doc.id },
   ));
+};
+
+export const exportGuestsAsCsv = async (guests: v.InferOutput<typeof GuestSchema>[]) => {
+  const resolved = await Promise.all(
+    guests.map(async ({ questions, createdAt, ...guest }) => ({
+      ...guest,
+      createdAt: createdAt.toDate().toISOString(),
+      questions: Object.fromEntries(await Promise.all(
+        Object.entries(questions).map(async ([question, answer]) => {
+          if (typeof answer === 'string' && answer.startsWith('gs://')) {
+            return [question, await getAttachment(answer)];
+          }
+
+          if (Array.isArray(answer)) {
+            return [question, answer.join(', ')];
+          }
+
+          return [question, answer];
+        })),
+      ),
+    })),
+  );
+
+  const string = stringify(resolved, {
+    delimiter: ';',
+    header: true,
+    columns: [
+      'id', 'name', 'phone', 'questions.age', 'questions.interests', 'questions.proofFollow', 'questions.proofComment', 'questions.proofStory', 'createdAt'
+    ],
+  });
+
+  return new Blob([string], { type: 'text/csv' });
 };

@@ -2,13 +2,17 @@
 import { useAsyncState } from '@vueuse/core';
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
-import { getGuestsByBooth, getSummary } from '../lib/api';
+import { useLoading } from '../composables/use-loading';
+import { exportGuestsAsCsv, getGuestsByBooth, getSummary } from '../lib/api';
+import { download } from '../utils/ui';
 
 const route = useRoute();
 
+const [isOverlayLoading, loading] = useLoading();
+
 const name = computed(() => route.params.name as string);
 const { state: general, isLoading, error } = useAsyncState(() => getSummary('visits'), null);
-const { state: guests, isLoading: guestsIsLoading, error: guestsError } = useAsyncState(() => getGuestsByBooth(name.value), null);
+const { state: guests, isLoading: guestsIsLoading, error: guestsError, execute: refresh } = useAsyncState(() => getGuestsByBooth(name.value), []);
 
 const visits = computed(() => {
   if (!guests.value) return [];
@@ -22,14 +26,22 @@ const visits = computed(() => {
   })
     .sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
 });
+const onExportClick = async () => {
+  if (!window.confirm('Apakah Anda yakin ingin mengekspor data pengunjung?')) return;
+
+  const blob = await loading(exportGuestsAsCsv(guests.value));
+
+  download('pengunjung.csv', blob);
+};
 </script>
 
 <template>
   <main class="container mx-auto flex flex-col items-center gap-6">
-    <div class="text-center">
-      <h1 class="mb-0">
+    <div class="flex flex-col gap-2">
+      <h1 class="text-center mb-0">
         {{ name }}
       </h1>
+
       <div class="flex justify-center gap-2">
         <div>
           <span class="text-gray-400">Total Kunjungan:</span> <span class="font-semibold">
@@ -43,13 +55,26 @@ const visits = computed(() => {
           </span>
         </div>
       </div>
+
+      <div class="flex justify-center gap-2">
+        <button type="button" :disabled="guestsIsLoading" @click="refresh()">
+          ↻ Refresh
+        </button>
+        <button type="button" :disabled="guestsIsLoading" @click="onExportClick()">
+          Export CSV
+        </button>
+      </div>
     </div>
 
     <div v-if="error" class="text-red-500">{{ error }}</div>
 
     <div v-if="guestsError" class="text-red-500">{{ guestsError }}</div>
 
-    <table v-if="guests" class="w-full max-w-screen-lg border-collapse">
+    <div v-if="guestsIsLoading">
+      Loading...
+    </div>
+
+    <table v-else-if="guests.length" class="w-full max-w-screen-lg border-collapse">
       <thead>
         <tr>
           <th class="text-white/50 border-b border-solid border-white/50 px-2 py-2.5">
@@ -96,8 +121,12 @@ const visits = computed(() => {
       </tbody>
     </table>
 
-    <div v-else-if="guestsIsLoading">
-      Loading stats...
+    <div v-else>
+      No data
+    </div>
+
+    <div v-if="isOverlayLoading" class="fixed inset-0 bg-gray-700/50 flex flex-col justify-center items-center">
+      Loading...
     </div>
   </main>
 </template>
