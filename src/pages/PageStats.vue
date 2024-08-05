@@ -13,11 +13,10 @@ const { state: guests, isLoading: guestsIsLoading, error: guestsError } = useAsy
 const visits = computed(() => {
   if (!guests.value) return [];
 
-  return guests.value.flatMap(guest => {
-    const byName = guest.visits.details[name.value];
+  return guests.value.flatMap(({ visits, ...guest }) => {
+    const byName = visits.details[name.value];
     return byName.timestamps.map((timestamp) => ({
-      id: guest.id,
-      name: guest.name,
+      ...guest,
       timestamp,
     }));
   })
@@ -53,6 +52,8 @@ const visits = computed(() => {
         <tr>
           <th class="text-white/50 border-b border-solid border-white/50 px-2 py-2.5">#</th>
           <th class="text-left border-b border-solid border-white/50 px-2 py-2.5">Nama</th>
+          <th class="text-center border-b border-solid border-white/50 px-2 py-2.5">No. Kontak</th>
+          <th class="text-center border-b border-solid border-white/50 px-2 py-2.5">Umur</th>
           <th class="text-right border-b border-solid border-white/50 px-2 py-2.5">Tanggal dan Waktu</th>
         </tr>
       </thead>
@@ -60,10 +61,10 @@ const visits = computed(() => {
         <tr v-for="(el, i) in visits" :key="el.timestamp.toMillis()" class="odd:bg-white/1 @dark:odd:bg-black/1">
           <td class="w-4ch text-gray-400 text-center px-1 py-1.5">{{ i + 1 }}</td>
           <td class="min-w-16ch px-1 py-1.5">
-            <RouterLink :to="{ name: 'guest', params: { guest: el.id } }">
-              {{ el.name }}
-            </RouterLink>
+            {{ el.name }}
           </td>
+          <td>{{ el.phone }}</td>
+          <td>{{ el.questions.age }}</td>
           <td class="text-gray-400 text-right px-1 py-1.5">
             {{ el.timestamp.toDate().toLocaleString('id') }}
           </td>

@@ -1,4 +1,4 @@
-import { createGlobalState, useLocalStorage, useSessionStorage, whenever } from '@vueuse/core';
+import { createGlobalState, useLocalStorage, whenever } from '@vueuse/core';
 import { RESOURCE_PREFIX } from '../constants';
 import { useGuest } from './use-guest';
 
