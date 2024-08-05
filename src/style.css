@@ -25,7 +25,7 @@
   }
 
   a:not(.btn) {
-    --at-apply: underline decoration-dashed decoration-1.5px;
+    --at-apply: underline decoration-dashed decoration-.085em;
     font-weight: 500;
     color: #646cff;
 
