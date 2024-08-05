@@ -1,3 +1,4 @@
+import { stringify } from 'csv-stringify/browser/esm/sync';
 import { initializeApp } from 'firebase/app';
 import { addDoc, arrayUnion, doc, FieldPath, getDoc, getDocs, getFirestore, query, runTransaction, Timestamp, where } from 'firebase/firestore/lite';
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
@@ -5,7 +6,6 @@ import * as v from 'valibot';
 import { BOOTHS } from '../contents';
 import { GuestCreateSchema, GuestPath, GuestSchema } from '../models/guest';
 import { SummaryPath, SummarySchemaMap, VisitsSummarySchema } from '../models/summary';
-import { stringify } from 'csv-stringify/browser/esm/sync';
 
 const config = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG);
 
@@ -162,7 +162,10 @@ export const getAttachment = async (gsUrl: string) => {
 
 export const getGuestsByBooth = async (name: string) => {
   const guestColl = doc(db, GuestPath.path).parent;
-  const q = query(guestColl, where('visits.list', 'array-contains', name));
+  const q = query(
+    guestColl,
+    where('visits.list', 'array-contains', name),
+  );
   const snapshot = await getDocs(q);
 
   return snapshot.docs.map((doc) => Object.assign(

@@ -1,18 +1,32 @@
 <script lang="ts" setup>
 import { useAsyncState } from '@vueuse/core';
-import { computed } from 'vue';
+import { Select } from 'radix-vue/namespaced';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useLoading } from '../composables/use-loading';
 import { exportGuestsAsCsv, getGuestsByBooth, getSummary } from '../lib/api';
 import { download } from '../utils/ui';
+
+const SORT_OPTIONS = [
+  'name',
+  'createdAt',
+];
 
 const route = useRoute();
 
 const [isOverlayLoading, loading] = useLoading();
 
 const name = computed(() => route.params.name as string);
+
+const query = ref({
+  asc: false,
+  sortBy: 'name',
+});
+
 const { state: general, isLoading, error } = useAsyncState(() => getSummary('visits'), null);
-const { state: guests, isLoading: guestsIsLoading, error: guestsError, execute: refresh } = useAsyncState(() => getGuestsByBooth(name.value), []);
+const { state: guests, isLoading: guestsIsLoading, error: guestsError, execute: refresh } = useAsyncState(
+  () => getGuestsByBooth(name.value), [],
+);
 
 const visits = computed(() => {
   if (!guests.value) return [];
@@ -24,8 +38,22 @@ const visits = computed(() => {
       timestamp,
     }));
   })
-    .sort((a, b) => b.timestamp.toMillis() - a.timestamp.toMillis());
+    .sort((a, b) => {
+      const sortBy = query.value.sortBy;
+      const asc = query.value.asc ? 1 : -1;
+
+      if (sortBy === 'name') {
+        return asc * a.name.localeCompare(b.name);
+      }
+
+      if (sortBy === 'createdAt') {
+        return asc * (a.timestamp.toMillis() - b.timestamp.toMillis());
+      }
+
+      return 0;
+    });
 });
+
 const onExportClick = async () => {
   if (!window.confirm('Apakah Anda yakin ingin mengekspor data pengunjung?')) return;
 
@@ -60,6 +88,36 @@ const onExportClick = async () => {
         <button type="button" :disabled="guestsIsLoading" @click="refresh()">
           ↻ Refresh
         </button>
+
+        <div class="btn p-0 border-none">
+          <button :disabled="guestsIsLoading" class="rounded-r-none px-0.8em" @click="query.asc = !query.asc">
+            {{ query.asc ? '↑' : '↓' }}
+          </button>
+
+          <Select.Root v-model="query.sortBy">
+            <Select.Trigger :disabled="guestsIsLoading" class="rounded-l-none pl-0.3em">
+              <Select.Value placeholder="Urut berdasarkan..." />
+            </Select.Trigger>
+
+            <Select.Portal>
+              <Select.Content class="min-w-16ch bg-$background rounded">
+                <Select.Viewport>
+                  <Select.Item v-for="el in SORT_OPTIONS" :key="el" :value="el"
+                    class="flex px-2 py-1 relative select-none rounded-sm data-[highlighted]:outline-none data-[highlighted]:bg-green data-[highlighted]:text-green-50">
+                    <Select.ItemText>
+                      {{ el }}
+                    </Select.ItemText>
+
+                    <Select.ItemIndicator class="ml-1 text-green">
+                      ✓
+                    </Select.ItemIndicator>
+                  </Select.Item>
+                </Select.Viewport>
+              </Select.Content>
+            </Select.Portal>
+          </Select.Root>
+        </div>
+
         <button type="button" :disabled="guestsIsLoading" @click="onExportClick()">
           Export CSV
         </button>
@@ -97,6 +155,7 @@ const onExportClick = async () => {
           </th>
         </tr>
       </thead>
+
       <tbody>
         <tr v-for="(el, i) in visits" :key="el.timestamp.toMillis()" class="odd:bg-white/1 @dark:odd:bg-black/1">
           <td class="w-4ch text-gray-400 text-center px-1 py-1.5">{{ i + 1 }}</td>

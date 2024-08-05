@@ -4,9 +4,50 @@ import { useLoading } from '../composables/use-loading';
 import { exportGuestsAsCsv, getGuests } from '../lib/api';
 import { omit } from '../utils/object';
 import { download } from '../utils/ui';
+import { computed, ref } from 'vue';
+import { Select } from 'radix-vue/namespaced';
+
+const SORT_OPTIONS = [
+  'name',
+  'age',
+  'domicile',
+  'visits',
+  'createdAt',
+];
 
 const [isOverlayLoading, loading] = useLoading();
+
+const query = ref({
+  asc: false,
+  sortBy: 'name',
+});
+
 const { state: data, isLoading, error, execute: refresh } = useAsyncState(() => getGuests(), []);
+
+const sorted = computed(() => [...data.value].sort((a, b) => {
+  const sortBy = query.value.sortBy;
+  const asc = query.value.asc ? 1 : -1;
+
+  switch (sortBy) {
+    case 'name':
+      return asc * a.name.localeCompare(b.name);
+
+    case 'age':
+      return asc * (a.questions.age - b.questions.age);
+
+    case 'domicile':
+      return asc * a.questions.domicile.localeCompare(b.questions.domicile);
+
+    case 'visits':
+      return asc * (a.visits.list.length - b.visits.list.length);
+
+    case 'createdAt':
+      return asc * a.createdAt.toMillis() - b.createdAt.toMillis();
+
+    default:
+      return 0;
+  }
+}));
 
 const onExportClick = async () => {
   if (!window.confirm('Apakah Anda yakin ingin mengekspor data pengunjung?')) return;
@@ -25,6 +66,36 @@ const onExportClick = async () => {
         <button type="button" :disabled="isLoading" @click="refresh()">
           ↻ Refresh
         </button>
+
+        <div class="btn p-0 border-none">
+          <button :disabled="isLoading" class="rounded-r-none px-0.8em" @click="query.asc = !query.asc">
+            {{ query.asc ? '↑' : '↓' }}
+          </button>
+
+          <Select.Root v-model="query.sortBy">
+            <Select.Trigger :disabled="isLoading" class="rounded-l-none pl-0.3em">
+              <Select.Value placeholder="Urut berdasarkan..." />
+            </Select.Trigger>
+
+            <Select.Portal>
+              <Select.Content class="min-w-16ch bg-$background rounded">
+                <Select.Viewport>
+                  <Select.Item v-for="el in SORT_OPTIONS" :key="el" :value="el"
+                    class="flex px-2 py-1 relative select-none rounded-sm data-[highlighted]:outline-none data-[highlighted]:bg-green data-[highlighted]:text-green-50">
+                    <Select.ItemText>
+                      {{ el }}
+                    </Select.ItemText>
+
+                    <Select.ItemIndicator class="ml-1 text-green">
+                      ✓
+                    </Select.ItemIndicator>
+                  </Select.Item>
+                </Select.Viewport>
+              </Select.Content>
+            </Select.Portal>
+          </Select.Root>
+        </div>
+
         <button type="button" :disabled="isLoading" @click="onExportClick()">
           Export CSV
         </button>
@@ -57,12 +128,15 @@ const onExportClick = async () => {
             ...
           </th>
           <th class="text-right border-b border-solid border-white/50 px-2 py-2.5">
-            Jml. Stan dikunjungi
+            Stan dikunjungi
+          </th>
+          <th class="text-right border-b border-solid border-white/50 px-2 py-2.5">
+            Waktu Daftar
           </th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(el, i) in data" :key="el.id" class="odd:bg-white/1 @dark:odd:bg-black/1">
+        <tr v-for="(el, i) in sorted" :key="el.id" class="odd:bg-white/1 @dark:odd:bg-black/1">
           <td class="w-4ch text-gray-400 text-center px-1 py-1.5">
             {{ i + 1 }}
           </td>
@@ -99,6 +173,11 @@ const onExportClick = async () => {
 
           <td class="text-gray-400 text-right px-1 py-1.5">
             x{{ el.visits.list.length }}
+          </td>
+
+          <td class="text-gray-400 text-right px-1 py-1.5">
+            <div>{{ el.createdAt.toDate().toLocaleTimeString('id') }}</div>
+            <div>{{ el.createdAt.toDate().toLocaleDateString('id') }}</div>
           </td>
         </tr>
       </tbody>
