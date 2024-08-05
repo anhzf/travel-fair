@@ -89,19 +89,19 @@ const onSubmit = async (ev: Event) => {
       <fieldset class="grid border-none">
         <label for="welcome/proofFollow">Bukti Follow</label>
         <input type="file" name="proofFollow" id="welcome/proofFollow"
-          :accept="GuestCreateSchema.entries.proofFollow.pipe[1].requirement.join(',')" required class="px-3 py-2">
+          :accept="GuestCreateSchema.entries.proofFollow.wrapped.pipe[1].requirement.join(',')" class="px-3 py-2">
       </fieldset>
 
       <fieldset class="grid border-none">
         <label for="welcome/proofStory">Bukti Share Story</label>
         <input type="file" name="proofStory" id="welcome/proofStory"
-          :accept="GuestCreateSchema.entries.proofStory.pipe[1].requirement.join(',')" required class="px-3 py-2">
+          :accept="GuestCreateSchema.entries.proofStory.wrapped.pipe[1].requirement.join(',')" class="px-3 py-2">
       </fieldset>
 
       <fieldset class="grid border-none">
         <label for="welcome/proofComment">Bukti Komen</label>
         <input type="file" name="proofComment" id="welcome/proofComment"
-          :accept="GuestCreateSchema.entries.proofComment.pipe[1].requirement.join(',')" required class="px-3 py-2">
+          :accept="GuestCreateSchema.entries.proofComment.wrapped.pipe[1].requirement.join(',')" class="px-3 py-2">
       </fieldset>
 
       <div v-if="errors.length">

@@ -27,19 +27,19 @@ export const GuestSchema = v.object({
 export const GuestCreateSchema = v.object({
   ...v.pick(GuestSchema, ['name', 'phone']).entries,
   age: v.string(),
-  proofFollow: v.pipe(
+  proofFollow: v.optional(v.pipe(
     v.file(),
     v.mimeType(['image/png', 'image/jpeg']),
     v.maxSize(1024 * 1024 /* 1 MB */),
-  ),
-  proofStory: v.pipe(
+  )),
+  proofStory: v.optional(v.pipe(
     v.file(),
     v.mimeType(['image/png', 'image/jpeg']),
     v.maxSize(1024 * 1024 /* 1 MB */),
-  ),
-  proofComment: v.pipe(
+  )),
+  proofComment: v.optional(v.pipe(
     v.file(),
     v.mimeType(['image/png', 'image/jpeg']),
     v.maxSize(1024 * 1024 /* 1 MB */),
-  ),
+  )),
 });

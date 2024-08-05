@@ -46,6 +46,8 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
   const uploadResults = await Promise.all(
     Object.entries({ proofFollow, proofStory, proofComment })
       .map(async ([key, file]) => {
+        if (!file) return [key] as const;
+
         const objRef = ref(storage, GuestPath.resolve({ guest: `questions/${key}_${Date.now()}_${file.name}` }));
         const task = await uploadBytes(objRef, file);
 
@@ -55,7 +57,7 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
 
   const parsed = v.parse(GuestSchema, {
     ...payload,
-    questions: Object.assign(Object.fromEntries(uploadResults.map(([key, upload]) => [key, upload.ref.toString()])), {
+    questions: Object.assign(Object.fromEntries(uploadResults.map(([key, upload]) => [key, upload?.ref.toString() ?? ''])), {
       age: payload.age,
     }),
     createdAt: Timestamp.now(),
@@ -68,6 +70,7 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
   } catch (err) {
     // Clean up the storage if the database operation fails
     uploadResults.forEach(([, upload]) => {
+      if (!upload) return;
       deleteObject(upload.ref);
     });
 
