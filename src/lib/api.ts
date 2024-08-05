@@ -57,8 +57,11 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
 
   const parsed = v.parse(GuestSchema, {
     ...payload,
-    questions: Object.assign(Object.fromEntries(uploadResults.map(([key, upload]) => [key, upload?.ref.toString() ?? ''])), {
+    questions: Object.assign(Object.fromEntries(uploadResults
+      .map(([key, upload]) => [key, upload?.ref.toString() ?? '-'])), {
       age: payload.age,
+      interests: payload.interests,
+      domicile: payload.domicile,
     }),
     createdAt: Timestamp.now(),
   });

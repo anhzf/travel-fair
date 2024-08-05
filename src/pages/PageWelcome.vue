@@ -2,11 +2,12 @@
 import { isValiError } from 'valibot';
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useSession } from '../composables/use-session';
 import { useLoading } from '../composables/use-loading';
+import { useSession } from '../composables/use-session';
 import { createGuest } from '../lib/api';
 import { GuestCreateSchema } from '../models/guest';
 import { getValiErrorMessages } from '../utils/error';
+import { formToObject } from '../utils/form';
 
 const INTEREST_OPTIONS = [
   'Harga',
@@ -22,6 +23,12 @@ const AGE_OPTIONS = [
   '35-50',
   '50+',
 ];
+const DOMICILE_OPTIONS = [
+  'Soloraya',
+  'DIY',
+  'Jateng',
+  'Lainnya',
+];
 
 const route = useRoute();
 const router = useRouter();
@@ -34,9 +41,16 @@ const errors = ref<string[]>([]);
 const onSubmit = async (ev: Event) => {
   try {
     const target = ev.target as HTMLFormElement;
-    const fd = new FormData(target);
+    const payload = formToObject(target);
 
-    const id = await createGuest(Object.fromEntries(fd) as any);
+    Object.keys(payload).forEach((key) => {
+      if (payload[key] instanceof File
+        && payload[key].size === 0) {
+        delete payload[key];
+      }
+    })
+
+    const id = await createGuest(payload);
 
     await updateSession(id);
 
@@ -57,23 +71,13 @@ const onSubmit = async (ev: Event) => {
 
     <form class="flex flex-col gap-4 w-full max-w-prose" @submit.prevent="onSubmit">
       <fieldset class="grid border-none">
-        <label for="welcome/name">Nama</label>
+        <label for="welcome/name">Nama Lengkap</label>
         <input type="text" name="name" id="welcome/name" required class="px-3 py-2">
       </fieldset>
 
       <fieldset class="grid border-none">
         <label for="welcome/phone">No. Handphone</label>
         <input type="tel" name="phone" id="welcome/phone" required class="px-3 py-2">
-      </fieldset>
-
-      <fieldset class="grid border-none">
-        <label for="welcome/interest">Apa yang membuat Anda tertarik dalam membeli paket Umrah?</label>
-        <select name="interest" id="welcome/interest" required class="px-3 py-2">
-          <option value="" selected disabled>Pilih salah satu</option>
-          <option v-for="value in INTEREST_OPTIONS" :key="value" :value>
-            {{ value }}
-          </option>
-        </select>
       </fieldset>
 
       <fieldset class="grid border-none">
@@ -84,6 +88,26 @@ const onSubmit = async (ev: Event) => {
             {{ value }}
           </option>
         </select>
+      </fieldset>
+
+      <fieldset class="grid border-none">
+        <label for="welcome/domicile">Domisili</label>
+        <select name="domicile" id="welcome/domicile" required class="px-3 py-2">
+          <option value="" selected disabled>Pilih salah satu</option>
+          <option v-for="value in DOMICILE_OPTIONS" :key="value" :value>
+            {{ value }}
+          </option>
+        </select>
+      </fieldset>
+
+      <fieldset class="grid border-none">
+        <legend>Apa yang membuat Anda tertarik dalam membeli paket Umrah?</legend>
+        <div v-for="value in INTEREST_OPTIONS" :key="value">
+          <input type="checkbox" name="interests" :value :id="`welcome/interests/${value}`" />
+          <label :for="`welcome/interests/${value}`">
+            {{ value }}
+          </label>
+        </div>
       </fieldset>
 
       <fieldset class="grid border-none">
@@ -113,7 +137,7 @@ const onSubmit = async (ev: Event) => {
       </div>
 
       <button type="submit" :disabled="isLoading">
-        Simpan
+        Daftar
       </button>
     </form>
   </main>
