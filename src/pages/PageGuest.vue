@@ -65,6 +65,14 @@ Promise.all([
             </div>
           </AsyncState>
 
+          <div v-else-if="Array.isArray(answer)">
+            <ul>
+              <li v-for="item in answer" :key="item">
+                {{ item }}
+              </li>
+            </ul>
+          </div>
+
           <div v-else>
             {{ answer }}
           </div>
