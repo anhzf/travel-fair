@@ -28,18 +28,20 @@ Promise.all([
 
 <template>
   <main class="container mx-auto flex flex-col items-center gap-6">
-    <code class="bg-white/5 px-1 rounded text-center">
-      {{ id ?? data?.id }}
+    <img src="/logo.png" alt="Logo" width="160" height="100" class="self-center object-contain">
+
+    <code class="bg-gray/5 px-1 rounded text-center">
+      {{ data?.id ?? id }}
     </code>
 
     <template v-if="data">
       <div class="text-center">
-        <h1 class="mb-2">
+        <h1 class="text-$theme mb-2">
           {{ data.name }}
         </h1>
 
-        <a :href="`tel:${data.phone}`" target="_blank">
-          +{{ data.phone }}
+        <a :href="`tel:+${data.phone}`" target="_blank">
+          {{ data.phone }}
         </a>
       </div>
 
@@ -79,8 +81,8 @@ Promise.all([
         </li>
       </ol>
 
-      <div class="w-full flex flex-col">
-        <h2>Daftar Kunjungan</h2>
+      <section class="w-full flex flex-col">
+        <h2 class="text-$theme">Daftar Kunjungan</h2>
 
         <ol class="w-full max-w-prose">
           <li v-for="(detail, visit) in data.visits.details" :key="visit">
@@ -90,7 +92,7 @@ Promise.all([
             <span class="text-gray-400"> x{{ detail.count }}</span>
           </li>
         </ol>
-      </div>
+      </section>
     </template>
 
     <div v-else-if="isProfileLoading || isSessionLoading">

@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useLoading } from '../composables/use-loading';
 import { useSession } from '../composables/use-session';
+import { SPONSORS } from '../contents';
 import { createGuest } from '../lib/api';
 import { GuestCreateSchema } from '../models/guest';
 import { getValiErrorMessages } from '../utils/error';
@@ -65,24 +66,30 @@ const onSubmit = async (ev: Event) => {
 
 <template>
   <main class="container m-auto flex flex-col items-center gap-6">
-    <h1 class="text-4xl">
-      Selamat Datang!
-    </h1>
+    <div class="flex flex-col items-center">
+      <img src="/logo.png" alt="Logo" width="300" height="200" class="object-contain">
 
-    <form class="flex flex-col gap-4 w-full max-w-prose" @submit.prevent="onSubmit">
+      <h1 class="text-xl text-$theme text-center m-0 font-semibold whitespace-pre-line">
+        {{ 'Selamat Datang Peserta\nPameran Umrah Travel Fair 2024' }}
+      </h1>
+    </div>
+
+    <form class="mt-8 flex flex-col gap-4 w-full max-w-prose" @submit.prevent="onSubmit">
       <fieldset class="grid border-none">
-        <label for="welcome/name">Nama Lengkap</label>
-        <input type="text" name="name" id="welcome/name" required class="px-3 py-2">
+        <label for="welcome/name" class="font-semibold">Nama Lengkap</label>
+        <input type="text" name="name" id="welcome/name" required
+          class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
       </fieldset>
 
       <fieldset class="grid border-none">
-        <label for="welcome/phone">No. Handphone</label>
-        <input type="tel" name="phone" id="welcome/phone" required class="px-3 py-2">
+        <label for="welcome/phone" class="font-semibold">No. Handphone</label>
+        <input type="tel" name="phone" id="welcome/phone" required
+          class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
       </fieldset>
 
       <fieldset class="grid border-none">
-        <label for="welcome/age">Umur</label>
-        <select name="age" id="welcome/age" required class="px-3 py-2">
+        <label for="welcome/age" class="font-semibold">Umur</label>
+        <select name="age" id="welcome/age" required class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
           <option value="" selected disabled>Pilih salah satu</option>
           <option v-for="value in AGE_OPTIONS" :key="value" :value>
             {{ value }}
@@ -91,8 +98,9 @@ const onSubmit = async (ev: Event) => {
       </fieldset>
 
       <fieldset class="grid border-none">
-        <label for="welcome/domicile">Domisili</label>
-        <select name="domicile" id="welcome/domicile" required class="px-3 py-2">
+        <label for="welcome/domicile" class="font-semibold">Domisili</label>
+        <select name="domicile" id="welcome/domicile" required
+          class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
           <option value="" selected disabled>Pilih salah satu</option>
           <option v-for="value in DOMICILE_OPTIONS" :key="value" :value>
             {{ value }}
@@ -101,31 +109,34 @@ const onSubmit = async (ev: Event) => {
       </fieldset>
 
       <fieldset class="grid border-none">
-        <legend>Apa yang membuat Anda tertarik dalam membeli paket Umrah?</legend>
-        <div v-for="value in INTEREST_OPTIONS" :key="value">
+        <legend class="font-semibold">Apa yang membuat Anda tertarik dalam membeli paket Umrah?</legend>
+        <label v-for="value in INTEREST_OPTIONS" :key="value" class="flex gap-2 p-0.5">
           <input type="checkbox" name="interests" :value :id="`welcome/interests/${value}`" />
-          <label :for="`welcome/interests/${value}`">
+          <span class="text-gray-700">
             {{ value }}
-          </label>
-        </div>
+          </span>
+        </label>
       </fieldset>
 
       <fieldset class="grid border-none">
-        <label for="welcome/proofFollow">Bukti Follow</label>
+        <label for="welcome/proofFollow" class="font-semibold">Bukti Follow</label>
         <input type="file" name="proofFollow" id="welcome/proofFollow"
-          :accept="GuestCreateSchema.entries.proofFollow.wrapped.pipe[1].requirement.join(',')" class="px-3 py-2">
+          :accept="GuestCreateSchema.entries.proofFollow.wrapped.pipe[1].requirement.join(',')"
+          class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
       </fieldset>
 
       <fieldset class="grid border-none">
-        <label for="welcome/proofStory">Bukti Share Story</label>
+        <label for="welcome/proofStory" class="font-semibold">Bukti Share Story</label>
         <input type="file" name="proofStory" id="welcome/proofStory"
-          :accept="GuestCreateSchema.entries.proofStory.wrapped.pipe[1].requirement.join(',')" class="px-3 py-2">
+          :accept="GuestCreateSchema.entries.proofStory.wrapped.pipe[1].requirement.join(',')"
+          class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
       </fieldset>
 
       <fieldset class="grid border-none">
-        <label for="welcome/proofComment">Bukti Komen</label>
+        <label for="welcome/proofComment" class="font-semibold">Bukti Komen</label>
         <input type="file" name="proofComment" id="welcome/proofComment"
-          :accept="GuestCreateSchema.entries.proofComment.wrapped.pipe[1].requirement.join(',')" class="px-3 py-2">
+          :accept="GuestCreateSchema.entries.proofComment.wrapped.pipe[1].requirement.join(',')"
+          class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
       </fieldset>
 
       <div v-if="errors.length">
@@ -140,5 +151,16 @@ const onSubmit = async (ev: Event) => {
         Daftar
       </button>
     </form>
+
+    <section class="flex flex-col">
+      <h2 class="sr-only">Sponsorship by</h2>
+
+      <ul class="p-0 flex gap-4 flex-wrap justify-center place-content-center list-none">
+        <li v-for="(sponsor, key) in SPONSORS" :key>
+          <img :src="sponsor.img" :alt="sponsor.title" :title="sponsor.title" width="100" height="100" loading="lazy"
+            class="object-contain">
+        </li>
+      </ul>
+    </section>
   </main>
 </template>

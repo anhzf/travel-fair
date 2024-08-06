@@ -31,7 +31,7 @@ const qrString = computed(() => {
 
     <div class="w-full flex justify-between items-start gap-4">
       <div>
-        <h1 class="text-xl m-0">
+        <h1 class="text-2xl text-$theme m-0">
           Ringkasan Kunjungan
         </h1>
 
@@ -44,7 +44,7 @@ const qrString = computed(() => {
       </div>
 
       <div class="flex flex-col lg:flex-row gap-2 items-end lg:items-center">
-        <RouterLink :to="{ name: 'visitors' }" class="px-1 py-2">
+        <RouterLink :to="{ name: 'visitors' }" class="px-0.6em py-1.2em">
           Semua pengunjung
         </RouterLink>
         <button type="button" :disabled="isLoading" @click="refresh()">
@@ -56,7 +56,7 @@ const qrString = computed(() => {
 
     <table class="w-full border-collapse">
       <thead>
-        <tr class="border-b border-b-solid border-white/25">
+        <tr class="border-b border-b-solid border-gray/25">
           <th class="px-1 py-2.5">
             Nama
           </th>
@@ -70,7 +70,7 @@ const qrString = computed(() => {
       </thead>
 
       <tbody>
-        <tr v-for="el in BOOTHS" :key="el" class="odd:bg-black/1 @dark:odd:bg-white/1">
+        <tr v-for="el in BOOTHS" :key="el" class="odd:bg-black/1">
           <td class="py-1 min-w-12ch">
             <RouterLink :to="{ name: 'check-in/stats', params: { name: el } }">
               {{ el }}

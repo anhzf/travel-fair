@@ -61,19 +61,23 @@ const onExportClick = async () => {
 <template>
   <main class="container mx-auto flex flex-col items-center gap-6">
     <div class="flex flex-col">
-      <h1 class="mb-0.3em">Daftar Pengunjung</h1>
+      <img src="/logo.png" alt="Logo" width="160" height="100" class="self-center object-contain">
+
+      <h1 class="text-$theme mt-0 mb-0.3em">Daftar Pengunjung</h1>
+
       <div class="flex justify-center gap-2">
         <button type="button" :disabled="isLoading" @click="refresh()">
           ↻ Refresh
         </button>
 
-        <div class="btn p-0 border-none">
-          <button :disabled="isLoading" class="rounded-r-none px-0.8em" @click="query.asc = !query.asc">
+        <div class="btn bg-transparent p-0 border-none">
+          <button :disabled="isLoading || !sorted.length" class="rounded-r-none px-0.8em"
+            @click="query.asc = !query.asc">
             {{ query.asc ? '↑' : '↓' }}
           </button>
 
           <Select.Root v-model="query.sortBy">
-            <Select.Trigger :disabled="isLoading" class="rounded-l-none pl-0.3em">
+            <Select.Trigger :disabled="isLoading || !sorted.length" class="rounded-l-none pl-0.3em">
               <Select.Value placeholder="Urut berdasarkan..." />
             </Select.Trigger>
 
@@ -96,7 +100,7 @@ const onExportClick = async () => {
           </Select.Root>
         </div>
 
-        <button type="button" :disabled="isLoading" @click="onExportClick()">
+        <button type="button" :disabled="isLoading || !sorted.length" @click="onExportClick()">
           Export CSV
         </button>
       </div>
@@ -108,29 +112,29 @@ const onExportClick = async () => {
 
     <table v-else-if="data.length" class="w-full max-w-screen-lg border-collapse">
       <thead>
-        <tr>
-          <th class="text-white/50 border-b border-solid border-white/50 px-2 py-2.5">
+        <tr class="border-b border-solid border-gray/25">
+          <th class="text-white/50 px-2 py-2.5">
             #
           </th>
-          <th class="text-left border-b border-solid border-white/50 px-2 py-2.5">
+          <th class="text-left px-2 py-2.5">
             Nama
           </th>
-          <th class="text-center border-b border-solid border-white/50 px-2 py-2.5">
+          <th class="text-center px-2 py-2.5">
             No. Kontak
           </th>
-          <th class="text-center border-b border-solid border-white/50 px-2 py-2.5">
+          <th class="text-center px-2 py-2.5">
             Domisili
           </th>
-          <th class="text-center border-b border-solid border-white/50 px-2 py-2.5">
+          <th class="text-center px-2 py-2.5">
             Umur
           </th>
-          <th class="text-center border-b border-solid border-white/50 px-2 py-2.5">
+          <th class="text-center px-2 py-2.5">
             ...
           </th>
-          <th class="text-right border-b border-solid border-white/50 px-2 py-2.5">
+          <th class="text-right px-2 py-2.5">
             Stan dikunjungi
           </th>
-          <th class="text-right border-b border-solid border-white/50 px-2 py-2.5">
+          <th class="text-right px-2 py-2.5">
             Waktu Daftar
           </th>
         </tr>

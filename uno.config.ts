@@ -6,7 +6,7 @@ export default defineConfig({
     presetWebFonts({
       timeouts: false,
       fonts: {
-        sans: 'Inter Tight:400,500,600,700,800,900',
+        sans: 'Poppins:400,500,600,700,800,900',
       },
     }),
   ],

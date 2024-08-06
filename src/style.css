@@ -1,13 +1,12 @@
 @layer base {
   :root {
-    --background: #242424;
-    --on-background: rgba(255, 255, 255, 0.87);
+    --background: #ffffff;
+    --on-background: #213547;
+    --theme: #33a6a6;
 
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-    font-weight: 400;
+    --at-apply: font-sans;
 
-    color-scheme: light dark;
+    color-scheme: light;
     color: var(--on-background);
     background-color: var(--background);
 
@@ -30,7 +29,7 @@
     color: #646cff;
 
     &:hover {
-      color: #535bf2;
+      color: #747bff;
       text-decoration-style: solid;
     }
   }
@@ -47,16 +46,6 @@
     font-size: 3.2em;
     line-height: 1.1;
   }
-
-  @media (prefers-color-scheme: light) {
-    :root {
-      --background: #ffffff;
-      --on-background: #213547;
-    }
-    a:not(.btn):hover {
-      color: #747bff;
-    }
-  }
 }
 
 @layer components {
@@ -69,7 +58,7 @@
     font-weight: 500;
     font-family: inherit;
     text-decoration: none;
-    background-color: #1a1a1a;
+    background-color: #f9f9f9;
     color: buttonText;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -90,12 +79,5 @@
 
   .card {
     padding: 2em;
-  }
-  
-  @media (prefers-color-scheme: light) {
-    button,
-    .btn {
-      background-color: #f9f9f9;
-    }
   }
 }

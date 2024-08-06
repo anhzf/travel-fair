@@ -66,7 +66,9 @@ const onExportClick = async () => {
 <template>
   <main class="container mx-auto flex flex-col items-center gap-6">
     <div class="flex flex-col gap-2">
-      <h1 class="text-center mb-0">
+      <img src="/logo.png" alt="Logo" width="160" height="100" class="self-center object-contain">
+
+      <h1 class="text-$theme text-center my-0">
         {{ name }}
       </h1>
 
@@ -89,13 +91,14 @@ const onExportClick = async () => {
           ↻ Refresh
         </button>
 
-        <div class="btn p-0 border-none">
-          <button :disabled="guestsIsLoading" class="rounded-r-none px-0.8em" @click="query.asc = !query.asc">
+        <div class="btn bg-transparent p-0 border-none">
+          <button :disabled="guestsIsLoading || !guests.length" class="rounded-r-none px-0.8em"
+            @click="query.asc = !query.asc">
             {{ query.asc ? '↑' : '↓' }}
           </button>
 
           <Select.Root v-model="query.sortBy">
-            <Select.Trigger :disabled="guestsIsLoading" class="rounded-l-none pl-0.3em">
+            <Select.Trigger :disabled="guestsIsLoading || !guests.length" class="rounded-l-none pl-0.3em">
               <Select.Value placeholder="Urut berdasarkan..." />
             </Select.Trigger>
 
@@ -118,7 +121,7 @@ const onExportClick = async () => {
           </Select.Root>
         </div>
 
-        <button type="button" :disabled="guestsIsLoading" @click="onExportClick()">
+        <button type="button" :disabled="guestsIsLoading || !guests.length" @click="onExportClick()">
           Export CSV
         </button>
       </div>

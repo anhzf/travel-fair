@@ -22,3 +22,22 @@ export const BOOTHS = [
   'NikmaTour',
   'Hilal Tour',
 ];
+
+export const SPONSORS = {
+  bsi: {
+    title: 'Bank Syariah Indonesia (BSI)',
+    img: '/sponsor/BSI 2.png',
+  },
+  citilink: {
+    title: 'Citilink',
+    img: '/sponsor/Citilink.png',
+  },
+  umrahAndalan: {
+    title: 'Andalan Haramain',
+    img: '/sponsor/Andalan Haramain (Transparent).png',
+  },
+  koperBesar: {
+    title: 'Koper Besar',
+    img: '/sponsor/Koper Besar.png',
+  },
+};
