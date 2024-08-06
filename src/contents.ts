@@ -8,9 +8,6 @@ export const BOOTHS = {
   'Madinah Iman Wisata': {
     img: '/booth/MIW.png',
   },
-  'Madinah Iman Wisata ABT': {
-    img: '/booth/MIW.png',
-  },
   'Arsy Buana Travelindo': {
     img: '/booth/Arsy Buana_Tidak HD.png',
   },
