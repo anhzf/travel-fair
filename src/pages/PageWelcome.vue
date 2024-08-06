@@ -139,6 +139,16 @@ const onSubmit = async (ev: Event) => {
           class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
       </fieldset>
 
+      <fieldset class="border-none">
+        <label>
+          <input type="checkbox" name="acceptTerms" id="welcome/acceptTerms" required>
+          <span class="">
+            Dengan ini saya menyatakan setuju dengan syarat dan ketentuan yang ditetapkan dalam acara Travel Fair 2024
+            ini.
+          </span>
+        </label>
+      </fieldset>
+
       <div v-if="errors.length">
         <ul class="text-red-500">
           <li v-for="err in errors" :key="err">
