@@ -83,7 +83,7 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
 };
 
 export const checkIn = async (guest: string, name: string) => {
-  if (!BOOTHS.includes(name)) {
+  if (!(name in BOOTHS)) {
     throw new Error('Booth not found');
   }
 

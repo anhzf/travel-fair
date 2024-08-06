@@ -70,17 +70,17 @@ const qrString = computed(() => {
       </thead>
 
       <tbody>
-        <tr v-for="el in BOOTHS" :key="el" class="odd:bg-black/1">
+        <tr v-for="name in Object.keys(BOOTHS)" :key="name" class="odd:bg-black/1">
           <td class="py-1 min-w-12ch">
-            <RouterLink :to="{ name: 'check-in/stats', params: { name: el } }">
-              {{ el }}
+            <RouterLink :to="{ name: 'check-in/stats', params: { name: name } }">
+              {{ name }}
             </RouterLink>
           </td>
           <td class="py-1 w-20ch text-center">
-            {{ isLoading ? 'Loading...' : state?.details[el]?.count || '-' }}
+            {{ isLoading ? 'Loading...' : state?.details[name]?.count || '-' }}
           </td>
           <td class="py-1 w-20ch text-center">
-            <button type="button" @click="qr = { title: el }">
+            <button type="button" @click="qr = { title: name }">
               Lihat QR
             </button>
           </td>
