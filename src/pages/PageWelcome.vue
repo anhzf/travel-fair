@@ -30,6 +30,24 @@ const DOMICILE_OPTIONS = [
   'Jateng',
   'Lainnya',
 ];
+const terms = {
+  'Kelayakan Peserta': [
+    'Peserta yang berhak mengikuti undian giveaway adalah pengunjung Travel Fair yang telah mengunjungi minimal 7 (tujuh) stand selama periode pameran Travel Fair berlangsung.',
+    'Peserta harus mengisi semua formulir pendaftaran Travel Fair dengan lengkap dan benar.'
+  ],
+  'Kebijakan Hadiah': [
+    'Hadiah voucher umroh gratis yang diberikan melalui program giveaway tidak dapat dipindahtangankan atau dijual kembali kepada pihak lain.',
+    'Voucher umroh gratis tidak dapat atas nama orang lain. Penerima hadiah akan dikonfirmasi berdasarkan identitas yang terdaftar saat pendaftaran.'
+  ],
+  'Ketentuan Umum': [
+    'Panitia berhak untuk mengubah syarat dan ketentuan giveaway sewaktu-waktu tanpa pemberitahuan terlebih dahulu.',
+    'Keputusan panitia bersifat final dan tidak dapat diganggu gugat.'
+  ],
+  'Proses Pengundian': [
+    'Pengundian akan dilakukan secara acak dan dilakukan oleh panitia di akhir acara Travel Fair.',
+    'Hasil undian akan diumumkan melalui media yang ditentukan oleh panitia.'
+  ],
+};
 
 const route = useRoute();
 const router = useRouter();
@@ -140,6 +158,20 @@ const onSubmit = async (ev: Event) => {
       </fieldset>
 
       <fieldset class="border-none">
+        <div class="bg-gray-100 px-2 py-1 mb-1 border border-solid border-gray-200">
+          <div class="font-bold">Syarat dan Ketentuant Giveaway Voucher Umroh Gratis Travel Fair 2024</div>
+          <ol class="pl-4">
+            <li v-for="(children, term) in terms" :key="term">
+              <div class="font-semibold">{{ term }}</div>
+              <ul class="pl-4">
+                <li v-for="child in children" :key="child">
+                  {{ child }}
+                </li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+
         <label>
           <input type="checkbox" name="acceptTerms" id="welcome/acceptTerms" required>
           <span class="">
