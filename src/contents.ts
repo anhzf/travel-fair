@@ -11,7 +11,10 @@ export const BOOTHS = {
   'Madinah Iman Wisata ABT': {
     img: '/booth/MIW.png',
   },
-  'Al-Fajr': {
+  'Arsy Buana Travelindo': {
+    img: '/booth/Arsy Buana_Tidak HD.png',
+  },
+  'Al-Fajr Travelindo Indonesia': {
     img: '/booth/Al-Fajr_Tidak HD.png',
   },
   'Hajar Aswad': {
@@ -26,7 +29,7 @@ export const BOOTHS = {
   'Golden Jannah': {
     img: '/booth/Golden Jannah.png',
   },
-  'Al-Bayt': {
+  'Al-Bayt Solo': {
     img: '/booth/Al-Bayt.png',
   },
   'Mubarak Tour': {
@@ -47,7 +50,7 @@ export const BOOTHS = {
   'Namira Travel Solo': {
     img: '/booth/Namira.png',
   },
-  'El-Ghazali': {
+  'El-Ghazali/Batari Tour': {
     img: '/booth/El-Ghazali.png',
   },
   'Marco': {
@@ -62,7 +65,7 @@ export const BOOTHS = {
   'NikmaTour': {
     img: '/booth/Nikma Tour_Tidak HD.png',
   },
-  'Hilal Tour': {
+  'Hilal Alkhair Travel': {
     img: '/booth/Hilal.png',
   },
 };
