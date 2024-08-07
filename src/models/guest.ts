@@ -32,16 +32,16 @@ export const GuestCreateSchema = v.object({
   proofFollow: v.optional(v.pipe(
     v.file(),
     v.mimeType(['image/png', 'image/jpeg']),
-    v.maxSize(1024 * 1024 /* 1 MB */),
+    v.maxSize(1024 * 1024 * 5 /* 5 MB */),
   )),
   proofStory: v.optional(v.pipe(
     v.file(),
     v.mimeType(['image/png', 'image/jpeg']),
-    v.maxSize(1024 * 1024 /* 1 MB */),
+    v.maxSize(1024 * 1024 * 5 /* 5 MB */),
   )),
   proofComment: v.optional(v.pipe(
     v.file(),
     v.mimeType(['image/png', 'image/jpeg']),
-    v.maxSize(1024 * 1024 /* 1 MB */),
+    v.maxSize(1024 * 1024 * 5 /* 5 MB */),
   )),
 });
