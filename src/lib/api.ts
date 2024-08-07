@@ -36,12 +36,19 @@ export const getGuests = async () => {
 
 export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) => {
   const coll = doc(db, GuestPath.path).parent;
+  const transformed = {
+    ...data,
+    interests: Array.isArray(data.interests) ? data.interests : [data.interests],
+  };
+
+  debugger;
+
   const {
     proofFollow,
     proofStory,
     proofComment,
     ...payload
-  } = v.parse(GuestCreateSchema, data);
+  } = v.parse(GuestCreateSchema, transformed);
 
   // Store the files in the storage
   const uploadResults = await Promise.all(

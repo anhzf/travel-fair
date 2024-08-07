@@ -141,6 +141,8 @@ const onSubmit = async (ev: Event) => {
         <input type="file" name="proofFollow" id="welcome/proofFollow"
           :accept="GuestCreateSchema.entries.proofFollow.wrapped.pipe[1].requirement.join(',')"
           class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
+        <small class="text-gray">Max {{ GuestCreateSchema.entries.proofFollow.wrapped.pipe[2].requirement / 1024 }}
+          KB</small>
       </fieldset>
 
       <fieldset class="grid border-none">
@@ -148,6 +150,8 @@ const onSubmit = async (ev: Event) => {
         <input type="file" name="proofStory" id="welcome/proofStory"
           :accept="GuestCreateSchema.entries.proofStory.wrapped.pipe[1].requirement.join(',')"
           class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
+        <small class="text-gray">Max {{ GuestCreateSchema.entries.proofStory.wrapped.pipe[2].requirement / 1024 }}
+          KB</small>
       </fieldset>
 
       <fieldset class="grid border-none">
@@ -155,6 +159,8 @@ const onSubmit = async (ev: Event) => {
         <input type="file" name="proofComment" id="welcome/proofComment"
           :accept="GuestCreateSchema.entries.proofComment.wrapped.pipe[1].requirement.join(',')"
           class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
+        <small class="text-gray">Max {{ GuestCreateSchema.entries.proofComment.wrapped.pipe[2].requirement / 1024 }}
+          KB</small>
       </fieldset>
 
       <fieldset class="border-none">
