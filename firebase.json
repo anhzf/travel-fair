@@ -7,7 +7,8 @@
     "rules": "storage.rules"
   },
   "hosting": {
-    "site": "showroom-anhzf",
+    ".site": "showroom-anhzf",
+    "site": "travel-fair",
     "public": "dist",
     "ignore": [
       "firebase.json",
