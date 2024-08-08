@@ -1,6 +1,6 @@
 import { stringify } from 'csv-stringify/browser/esm/sync';
 import { initializeApp } from 'firebase/app';
-import { addDoc, arrayUnion, doc, FieldPath, getDoc, getDocs, getFirestore, query, runTransaction, Timestamp, where } from 'firebase/firestore/lite';
+import { addDoc, arrayUnion, doc, FieldPath, getDoc, getDocs, getFirestore, limit, query, runTransaction, Timestamp, where } from 'firebase/firestore/lite';
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import * as v from 'valibot';
 import { BOOTHS } from '../contents';
@@ -41,14 +41,17 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
     interests: Array.isArray(data.interests) ? data.interests : [data.interests],
   };
 
-  debugger;
-
   const {
     proofFollow,
     proofStory,
     proofComment,
     ...payload
   } = v.parse(GuestCreateSchema, transformed);
+
+  const duplicateQuery = query(coll, where('phone', '==', payload.phone), limit(1));
+  const duplicateSnap = await getDocs(duplicateQuery);
+
+  if (duplicateSnap.size > 0) throw new Error('No. HP sudah terdaftar');
 
   // Store the files in the storage
   const uploadResults = await Promise.all(
