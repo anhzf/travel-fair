@@ -29,19 +29,7 @@ export const GuestCreateSchema = v.object({
   age: v.string(),
   interests: v.array(v.string()),
   domicile: v.string(),
-  proofFollow: v.optional(v.pipe(
-    v.file(),
-    v.mimeType(['image/png', 'image/jpeg']),
-    v.maxSize(1024 * 1024 * 5 /* 5 MB */),
-  )),
-  proofStory: v.optional(v.pipe(
-    v.file(),
-    v.mimeType(['image/png', 'image/jpeg']),
-    v.maxSize(1024 * 1024 * 5 /* 5 MB */),
-  )),
-  proofComment: v.optional(v.pipe(
-    v.file(),
-    v.mimeType(['image/png', 'image/jpeg']),
-    v.maxSize(1024 * 1024 * 5 /* 5 MB */),
-  )),
+  proofFollow: v.optional(v.boolean(), false),
+  proofStory: v.optional(v.boolean(), false),
+  proofComment: v.optional(v.boolean(), false),
 });

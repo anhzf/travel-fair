@@ -36,17 +36,13 @@ export const getGuests = async () => {
 
 export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) => {
   const coll = doc(db, GuestPath.path).parent;
-  const transformed = {
-    ...data,
-    interests: Array.isArray(data.interests) ? data.interests : [data.interests],
-  };
 
   const {
     proofFollow,
     proofStory,
     proofComment,
     ...payload
-  } = v.parse(GuestCreateSchema, transformed);
+  } = v.parse(GuestCreateSchema, data);
 
   const duplicateQuery = query(coll, where('phone', '==', payload.phone), limit(1));
   const duplicateSnap = await getDocs(duplicateQuery);
@@ -55,7 +51,7 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
 
   // Store the files in the storage
   const uploadResults = await Promise.all(
-    Object.entries({ proofFollow, proofStory, proofComment })
+    Object.entries({/*  proofFollow, proofStory, proofComment  */ } as Record<string, File | null>)
       .map(async ([key, file]) => {
         if (!file) return [key] as const;
 
@@ -68,12 +64,18 @@ export const createGuest = async (data: v.InferInput<typeof GuestCreateSchema>) 
 
   const parsed = v.parse(GuestSchema, {
     ...payload,
-    questions: Object.assign(Object.fromEntries(uploadResults
-      .map(([key, upload]) => [key, upload?.ref.toString() ?? '-'])), {
-      age: payload.age,
-      interests: payload.interests,
-      domicile: payload.domicile,
-    }),
+    questions: Object.assign(
+      Object.fromEntries(uploadResults
+        .map(([key, upload]) => [key, upload?.ref.toString() ?? '-'])),
+      {
+        proofFollow,
+        proofStory,
+        proofComment,
+        age: payload.age,
+        interests: payload.interests,
+        domicile: payload.domicile,
+      },
+    ),
     createdAt: Timestamp.now(),
   });
 

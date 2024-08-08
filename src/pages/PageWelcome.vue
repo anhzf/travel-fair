@@ -6,7 +6,6 @@ import { useLoading } from '../composables/use-loading';
 import { useSession } from '../composables/use-session';
 import { SPONSORS } from '../contents';
 import { createGuest } from '../lib/api';
-import { GuestCreateSchema } from '../models/guest';
 import { getValiErrorMessages } from '../utils/error';
 import { formToObject } from '../utils/form';
 
@@ -32,7 +31,7 @@ const DOMICILE_OPTIONS = [
 ];
 const terms = {
   'Kelayakan Peserta': [
-    'Peserta yang berhak mengikuti undian giveaway adalah pengunjung Travel Fair yang telah mengunjungi minimal 7 (tujuh) stand selama periode pameran Travel Fair berlangsung.',
+    'Peserta yang berhak mengikuti undian giveaway adalah pengunjung Travel Fair yang telah check-in minimal 7 (tujuh) stand selama periode pameran Travel Fair berlangsung.',
     'Peserta harus mengisi semua formulir pendaftaran Travel Fair dengan lengkap dan benar.'
   ],
   'Kebijakan Hadiah': [
@@ -69,7 +68,13 @@ const onSubmit = async (ev: Event) => {
       }
     })
 
-    const id = await createGuest(payload);
+    const id = await createGuest({
+      ...payload,
+      proofFollow: payload.proofFollow === 'on',
+      proofStory: payload.proofStory === 'on',
+      proofComment: payload.proofComment === 'on',
+      interests: Array.isArray(payload.interests) ? payload.interests : [payload.interests],
+    });
 
     await updateSession(id);
 
@@ -140,37 +145,30 @@ const onSubmit = async (ev: Event) => {
       </fieldset>
 
       <fieldset class="grid border-none">
-        <label for="welcome/proofFollow" class="font-semibold">Bukti Follow Instagram**</label>
-        <input type="file" name="proofFollow" id="welcome/proofFollow"
-          :accept="GuestCreateSchema.entries.proofFollow.wrapped.pipe[1].requirement.join(',')"
-          class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
-        <small class="text-gray-600">
-          *Max {{ GuestCreateSchema.entries.proofFollow.wrapped.pipe[2].requirement / 1024 }} KB
-        </small>
-        <small class="text-gray-600">
-          **Akun instagram: <a href="https://www.instagram.com/umrohtravelfairsolo/" target="_blank"
-            rel="noopener noreferrer">@umrohtravelfairsolo</a>
-        </small>
-      </fieldset>
+        <legend class="font-semibold">Review persyaratan giveaway</legend>
+        <label>
+          <input type="checkbox" name="proofFollow" id="welcome/proofFollow" required>
+          <span class="">
+            Sudah follow akun Instagram <a href="https://www.instagram.com/umrohtravelfairsolo/" target="_blank"
+              rel="noopener noreferrer">@umrohtravelfairsolo</a>.
+          </span>
+        </label>
 
-      <fieldset class="grid border-none">
-        <label for="welcome/proofStory" class="font-semibold">Bukti Share Story*</label>
-        <input type="file" name="proofStory" id="welcome/proofStory"
-          :accept="GuestCreateSchema.entries.proofStory.wrapped.pipe[1].requirement.join(',')"
-          class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
-        <small class="text-gray-600">
-          *Max {{ GuestCreateSchema.entries.proofStory.wrapped.pipe[2].requirement / 1024 }} KB
-        </small>
-      </fieldset>
+        <label>
+          <input type="checkbox" name="proofStory" id="welcome/proofStory" required>
+          <span class="">
+            Sudah share story event <a href="https://www.instagram.com/umrohtravelfairsolo/" target="_blank"
+              rel="noopener noreferrer">ini</a>.
+          </span>
+        </label>
 
-      <fieldset class="grid border-none">
-        <label for="welcome/proofComment" class="font-semibold">Bukti Komen*</label>
-        <input type="file" name="proofComment" id="welcome/proofComment"
-          :accept="GuestCreateSchema.entries.proofComment.wrapped.pipe[1].requirement.join(',')"
-          class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
-        <small class="text-gray-600">
-          *Max {{ GuestCreateSchema.entries.proofComment.wrapped.pipe[2].requirement / 1024 }} KB
-        </small>
+        <label>
+          <input type="checkbox" name="proofComment" id="welcome/proofComment" required>
+          <span class="">
+            Sudah komen di postingan event <a href="https://www.instagram.com/umrohtravelfairsolo/" target="_blank"
+              rel="noopener noreferrer">ini</a>.
+          </span>
+        </label>
       </fieldset>
 
       <fieldset class="border-none">
@@ -196,19 +194,6 @@ const onSubmit = async (ev: Event) => {
           </span>
         </label>
       </fieldset>
-
-      <div class="flex flex-col">
-        <label v-for="(label, name) in {
-          'review/proofFollow': 'Sudah follow akun instagram @umrohtravelfairsolo',
-          'review/proofStory': 'Sudah share story event ini',
-          'review/proofComment': 'Sudah komen di postingan event ini',
-        }" :key="name">
-          <input type="checkbox" :name :id="`welcome/${name}`" required>
-          <span class="">
-            {{ label }}
-          </span>
-        </label>
-      </div>
 
       <div v-if="errors.length">
         <ul class="text-red-500">
