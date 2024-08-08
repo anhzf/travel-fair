@@ -217,5 +217,10 @@ const onSubmit = async (ev: Event) => {
         </li>
       </ul>
     </section>
+
+    <div v-if="isLoading"
+      class="fixed inset-0 bg-gray-700/50 text-white flex flex-col justify-center items-center text-center">
+      Loading...
+    </div>
   </main>
 </template>
