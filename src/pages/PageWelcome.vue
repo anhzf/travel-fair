@@ -127,13 +127,16 @@ const onSubmit = async (ev: Event) => {
       </fieldset>
 
       <fieldset class="grid border-none">
-        <legend class="font-semibold">Apa yang membuat Anda tertarik dalam membeli paket Umrah?</legend>
+        <legend class="font-semibold">Apa yang membuat Anda tertarik dalam membeli paket Umrah?*</legend>
         <label v-for="value in INTEREST_OPTIONS" :key="value" class="flex gap-2 p-0.5">
           <input type="checkbox" name="interests" :value :id="`welcome/interests/${value}`" />
           <span class="text-gray-700">
             {{ value }}
           </span>
         </label>
+        <small class="text-gray-600">
+          *Pilih lebih dari satu
+        </small>
       </fieldset>
 
       <fieldset class="grid border-none">
@@ -151,7 +154,7 @@ const onSubmit = async (ev: Event) => {
       </fieldset>
 
       <fieldset class="grid border-none">
-        <label for="welcome/proofStory" class="font-semibold">Bukti Share Story</label>
+        <label for="welcome/proofStory" class="font-semibold">Bukti Share Story*</label>
         <input type="file" name="proofStory" id="welcome/proofStory"
           :accept="GuestCreateSchema.entries.proofStory.wrapped.pipe[1].requirement.join(',')"
           class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
@@ -161,7 +164,7 @@ const onSubmit = async (ev: Event) => {
       </fieldset>
 
       <fieldset class="grid border-none">
-        <label for="welcome/proofComment" class="font-semibold">Bukti Komen</label>
+        <label for="welcome/proofComment" class="font-semibold">Bukti Komen*</label>
         <input type="file" name="proofComment" id="welcome/proofComment"
           :accept="GuestCreateSchema.entries.proofComment.wrapped.pipe[1].requirement.join(',')"
           class="px-2.5 py-3 bg-gray-50 border border-gray-200 border-solid">
@@ -194,6 +197,19 @@ const onSubmit = async (ev: Event) => {
         </label>
       </fieldset>
 
+      <div class="flex flex-col">
+        <label v-for="(label, name) in {
+          'review/proofFollow': 'Sudah follow akun instagram @umrohtravelfairsolo',
+          'review/proofStory': 'Sudah share story event ini',
+          'review/proofComment': 'Sudah komen di postingan event ini',
+        }" :key="name">
+          <input type="checkbox" :name :id="`welcome/${name}`" required>
+          <span class="">
+            {{ label }}
+          </span>
+        </label>
+      </div>
+
       <div v-if="errors.length">
         <ul class="text-red-500">
           <li v-for="err in errors" :key="err">
@@ -202,9 +218,11 @@ const onSubmit = async (ev: Event) => {
         </ul>
       </div>
 
-      <button type="submit" :disabled="isLoading">
-        Daftar
-      </button>
+      <div class="flex mt-2">
+        <button type="submit" :disabled="isLoading" class="grow">
+          Daftar
+        </button>
+      </div>
     </form>
 
     <section class="flex flex-col">
