@@ -6,6 +6,7 @@ import * as v from 'valibot';
 import { BOOTHS } from '../contents';
 import { GuestCreateSchema, GuestPath, GuestSchema } from '../models/guest';
 import { SummaryPath, SummarySchemaMap, VisitsSummarySchema } from '../models/summary';
+import { SecuritySettingSchema, SettingPath } from '../models/settings';
 
 const config = JSON.parse(import.meta.env.VITE_FIREBASE_CONFIG);
 
@@ -217,3 +218,14 @@ export const exportGuestsAsCsv = async (guests: v.InferOutput<typeof GuestSchema
 
   return new Blob([string], { type: 'text/csv' });
 };
+
+export const checkPassword = async (password: string) => {
+  const docRef = doc(db, SettingPath.resolve({ setting: 'security' }));
+  const snapshot = await getDoc(docRef);
+
+  if (!snapshot.exists()) return false;
+
+  const data = v.parse(SecuritySettingSchema, snapshot.data());
+
+  return data.password === password;
+}
