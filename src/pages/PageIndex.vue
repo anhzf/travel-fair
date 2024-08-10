@@ -6,10 +6,12 @@ import { computed, ref } from 'vue';
 import { RouterLink, useRouter } from 'vue-router';
 import AsyncState from '../components/AsyncState.vue';
 import { BOOTHS } from '../contents';
-import { getSummary } from '../lib/api';
+import { getSummary, setPassword } from '../lib/api';
+import { useLoading } from '../composables/use-loading';
 
 const router = useRouter();
 
+const [isLoadingOverlay, loading] = useLoading();
 const { state, isLoading, execute: refresh, error } = useAsyncState(() => getSummary('visits'), null);
 
 const qr = ref<{
@@ -23,6 +25,20 @@ const qrString = computed(() => {
   url.pathname = fullPath;
   return url.toString();
 });
+
+const onSetPasswordClick = async () => {
+  const oldPwd = window.prompt('Masukkan password lama') || '';
+  const newPwd = window.prompt('Masukkan password baru') || '';
+
+  try {
+    await loading(setPassword(oldPwd, newPwd));
+
+    await router.replace({ query: { pwd: newPwd } });
+    window.alert('Password berhasil diubah, Anda dapat menyalin url yang baru sekarang.');
+  } catch (err) {
+    window.alert(String(err));
+  }
+};
 </script>
 
 <template>
@@ -49,6 +65,9 @@ const qrString = computed(() => {
         </RouterLink>
         <button type="button" :disabled="isLoading" @click="refresh()">
           ↻ Refresh
+        </button>
+        <button type="button" :disabled="isLoading || isLoadingOverlay" @click="onSetPasswordClick">
+          Atur password
         </button>
       </div>
     </div>
@@ -88,6 +107,13 @@ const qrString = computed(() => {
       </tbody>
     </table>
   </main>
+
+  <Teleport v-if="isLoadingOverlay" to="body">
+    <div class="fixed inset-0 bg-gray-700/50 flex flex-col justify-center items-center">
+      Loading...
+    </div>
+  </Teleport>
+
 
   <Dialog :open="!!qr" class="relative z-100 flex flex-col justify-center items-center">
     <div class="fixed inset-0 bg-gray-700/50" aria-hidden="true" @click="qr = undefined" />

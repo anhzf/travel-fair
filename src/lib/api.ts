@@ -1,6 +1,6 @@
 import { stringify } from 'csv-stringify/browser/esm/sync';
 import { initializeApp } from 'firebase/app';
-import { addDoc, arrayUnion, doc, FieldPath, getDoc, getDocs, getFirestore, limit, query, runTransaction, Timestamp, where } from 'firebase/firestore/lite';
+import { addDoc, arrayUnion, doc, FieldPath, getDoc, getDocs, getFirestore, limit, query, runTransaction, Timestamp, updateDoc, where } from 'firebase/firestore/lite';
 import { deleteObject, getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import * as v from 'valibot';
 import { BOOTHS } from '../contents';
@@ -219,7 +219,10 @@ export const exportGuestsAsCsv = async (guests: v.InferOutput<typeof GuestSchema
   return new Blob([string], { type: 'text/csv' });
 };
 
-export const checkPassword = async (password: string) => {
+// Stores the password for the current session (memory only).
+let passwordMemory: string;
+
+export const checkPassword = async (password = passwordMemory) => {
   const docRef = doc(db, SettingPath.resolve({ setting: 'security' }));
   const snapshot = await getDoc(docRef);
 
@@ -227,5 +230,26 @@ export const checkPassword = async (password: string) => {
 
   const data = v.parse(SecuritySettingSchema, snapshot.data());
 
-  return data.password === password;
+  const isAllowed = data.password === password;
+
+  if (isAllowed) {
+    passwordMemory = password;
+  }
+
+  return isAllowed;
+};
+
+export const setPassword = async (password: string, newPassword: string) => {
+  const docRef = doc(db, SettingPath.resolve({ setting: 'security' }));
+  const snapshot = await getDoc(docRef);
+
+  if (!snapshot.exists()) throw new Error('Setting keamanan tidak ditemukan');
+
+  const data = v.parse(SecuritySettingSchema, snapshot.data());
+
+  if (data.password !== password) throw new Error('Password lama tidak cocok');
+
+  await updateDoc(docRef, 'password', newPassword);
+
+  passwordMemory = newPassword;
 }

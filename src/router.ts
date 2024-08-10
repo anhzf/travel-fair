@@ -66,19 +66,13 @@ export const router = createRouter({
   routes,
 });
 
-// Stores the password for the current session (memory only).
-let passwordMemory: string;
-
 router.beforeEach(async (to, _, next) => {
   const { data: guest, isLoading } = useSession();
   await until(isLoading).toBe(false);
 
   if (to.meta.pwd == true) {
-    const isAllowed = await checkPassword(passwordMemory ?? to.query.pwd as string);
-
-    if (isAllowed) {
-      passwordMemory = to.query.pwd as string;
-    }
+    const isAllowed = typeof to.query.pwd === 'string'
+      && await checkPassword(to.query.pwd);
 
     return isAllowed
       ? next()
