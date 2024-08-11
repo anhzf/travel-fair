@@ -189,7 +189,7 @@ export const getGuestsByBooth = async (name: string) => {
 
 export const exportGuestsAsCsv = async (guests: v.InferOutput<typeof GuestSchema>[]) => {
   const resolved = await Promise.all(
-    guests.map(async ({ questions, createdAt, ...guest }) => ({
+    guests.map(async ({ questions, createdAt, visits, ...guest }) => ({
       ...guest,
       createdAt: createdAt.toDate().toISOString(),
       questions: Object.fromEntries(await Promise.all(
@@ -205,6 +205,8 @@ export const exportGuestsAsCsv = async (guests: v.InferOutput<typeof GuestSchema
           return [question, answer];
         })),
       ),
+      visits: visits.list.length,
+      allTimeVisits: Object.values(visits.details).reduce((acc, visit) => acc + visit.count, 0),
     })),
   );
 
@@ -212,7 +214,7 @@ export const exportGuestsAsCsv = async (guests: v.InferOutput<typeof GuestSchema
     delimiter: ';',
     header: true,
     columns: [
-      'id', 'name', 'phone', 'questions.age', 'questions.interests', 'questions.proofFollow', 'questions.proofComment', 'questions.proofStory', 'createdAt'
+      'id', 'name', 'phone', 'questions.age', 'questions.interests', 'questions.proofFollow', 'questions.proofComment', 'questions.proofStory', 'createdAt', 'visits', 'allTimeVisits',
     ],
   });
 
